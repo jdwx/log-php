@@ -15,6 +15,16 @@ require_once __DIR__ . '/MyFormattedLogger.php';
 final class FormattedLoggerTest extends TestCase {
 
 
+    public function testExceptionToArray() : void {
+        $ex = new Exception( 'TEST_MESSAGE', 0, new LogicException( 'INNER_MESSAGE', 1 ) );
+        $exArray = StderrLogger::exceptionToArray( $ex );
+        self::assertStringContainsString( 'TEST_MESSAGE', $exArray[ 'message' ] );
+        self::assertStringContainsString( 'INNER_MESSAGE', $exArray[ 'previous' ][ 'message' ] );
+        self::assertSame( 0, $exArray[ 'code' ] );
+        self::assertSame( 1, $exArray[ 'previous' ][ 'code' ] );
+    }
+
+
     public function testFormatArray() : void {
         $result = StderrLogger::formatArray( [ 'message' => 'TEST_MESSAGE', 'foo' => 'bar' ] );
         self::assertStringContainsString( 'TEST_MESSAGE', $result );

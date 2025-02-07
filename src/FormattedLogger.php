@@ -18,6 +18,22 @@ abstract class FormattedLogger implements LoggerInterface {
     use RelayLoggerTrait;
 
 
+    public static function exceptionToArray( \Throwable $x ) : array {
+        $r = [
+            'class' => get_class( $x ),
+            'message' => $x->getMessage(),
+            'code' => $x->getCode(),
+            'file' => $x->getFile(),
+            'line' => $x->getLine(),
+            'trace' => $x->getTrace(),
+        ];
+        if ( $x->getPrevious() !== null ) {
+            $r[ 'previous' ] = static::exceptionToArray( $x->getPrevious() );
+        }
+        return $r;
+    }
+
+
     /** @param array<string, mixed> $i_r */
     public static function formatArray( array $i_r ) : string {
         return self::formatArrayInner( $i_r, 0 );
