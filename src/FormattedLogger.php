@@ -25,7 +25,7 @@ abstract class FormattedLogger implements LoggerInterface {
             'code' => $x->getCode(),
             'file' => $x->getFile(),
             'line' => $x->getLine(),
-            'trace' => $x->getTrace(),
+            'trace' => $x->getTraceAsString(),
         ];
         if ( $x->getPrevious() !== null ) {
             $r[ 'previous' ] = static::exceptionToArray( $x->getPrevious() );
