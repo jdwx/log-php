@@ -9,13 +9,14 @@ namespace JDWX\Log;
 
 use Countable;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 use Stringable;
 
 
 class BufferLogger implements LoggerInterface, Countable {
 
 
-    use RelayLoggerTrait;
+    use LoggerTrait;
 
 
     /** @var LogEntry[] */

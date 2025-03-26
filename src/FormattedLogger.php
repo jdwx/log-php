@@ -8,6 +8,7 @@ namespace JDWX\Log;
 
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use Stringable;
 
@@ -15,9 +16,10 @@ use Stringable;
 abstract class FormattedLogger implements LoggerInterface {
 
 
-    use RelayLoggerTrait;
+    use LoggerTrait;
 
 
+    /** @return array<string, mixed> */
     public static function exceptionToArray( \Throwable $x ) : array {
         $r = [
             'class' => get_class( $x ),
@@ -27,8 +29,9 @@ abstract class FormattedLogger implements LoggerInterface {
             'line' => $x->getLine(),
             'trace' => $x->getTraceAsString(),
         ];
-        if ( $x->getPrevious() !== null ) {
-            $r[ 'previous' ] = static::exceptionToArray( $x->getPrevious() );
+        $prev = $x->getPrevious();
+        if ( $prev instanceof \Throwable ) {
+            $r[ 'previous' ] = static::exceptionToArray( $prev );
         }
         return $r;
     }
