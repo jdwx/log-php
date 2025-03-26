@@ -104,6 +104,18 @@ class BufferLoggerTest extends TestCase {
     }
 
 
+    public function testLog() : void {
+        $log = new BufferLogger();
+        $rContext = [ 'foo' => 'bar' ];
+        $log->log( LogLevel::DEBUG, 'Test', $rContext );
+        self::assertCount( 1, $log );
+        $log = $log->shiftLog();
+        self::assertSame( LogLevel::DEBUG, $log->level );
+        self::assertSame( 'Test', $log->message );
+        self::assertSame( $rContext, $log->context );
+    }
+
+
     public function testNotice() : void {
         $log = new BufferLogger();
         $rContext = [ 'foo' => 'bar' ];
