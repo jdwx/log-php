@@ -7,7 +7,6 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
-use InvalidArgumentException;
 use Psr\Log\LogLevel;
 use Stringable;
 
@@ -34,7 +33,7 @@ readonly class LogEntry {
             LogLevel::NOTICE, LOG_NOTICE => LogLevel::NOTICE,
             LogLevel::INFO, LOG_INFO => LogLevel::INFO,
             LogLevel::DEBUG, LOG_DEBUG => LogLevel::DEBUG,
-            default => throw new InvalidArgumentException( "Invalid log level: {$i_level}" ),
+            default => "INVALID({$i_level})",
         };
         $this->message = strval( $i_stMessage );
         $this->context = $i_rContext;

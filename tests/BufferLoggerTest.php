@@ -5,11 +5,13 @@ declare( strict_types = 1 );
 
 
 use JDWX\Log\BufferLogger;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
 
-class BufferLoggerTest extends TestCase {
+#[CoversClass( BufferLogger::class )]
+final class BufferLoggerTest extends TestCase {
 
 
     public function testAlert() : void {

@@ -7,13 +7,11 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
-use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
-use Psr\Log\LogLevel;
 use Stringable;
 
 
-abstract class FormattedLogger implements LoggerInterface {
+abstract class FormattedLogger extends AbstractLogger {
 
 
     use LoggerTrait;
@@ -83,29 +81,38 @@ abstract class FormattedLogger implements LoggerInterface {
      * @inheritDoc
      */
     public function log( mixed $level, Stringable|string $message, array $context = [] ) : void {
-        $stLevel = match ( $level ) {
-            LOG_EMERG, LogLevel::EMERGENCY => 'EMERGENCY',
-            LOG_ALERT, LogLevel::ALERT => 'ALERT',
-            LOG_CRIT, LogLevel::CRITICAL => 'CRITICAL',
-            LOG_ERR, LogLevel::ERROR => 'ERROR',
-            LOG_WARNING, LogLevel::WARNING => 'WARNING',
-            LOG_NOTICE, LogLevel::NOTICE => 'NOTICE',
-            LOG_INFO, LogLevel::INFO => 'INFO',
-            LOG_DEBUG, LogLevel::DEBUG => 'DEBUG',
-            default => 'UNKNOWN',
-        };
-        $stMessage = $message instanceof Stringable ? $message->__toString() : $message;
-        if ( ! empty( $context ) ) {
-            if ( isset( $context[ 'class' ] ) ) {
-                $stLevel .= '(' . $context[ 'class' ] . ')';
-                unset( $context[ 'class' ] );
-            }
-            if ( isset( $context[ 'code' ] ) && $context[ 'code' ] === 0 ) {
-                unset( $context[ 'code' ] );
-            }
-            $stMessage .= ' ' . static::formatArray( $context );
+        $stLevel = $this->renderLevel( $level, $context );
+        $stMessage = $this->renderMessage( $message );
+        $stContext = $this->renderContext( $context );
+        $this->write( trim( "{$stLevel}: {$stMessage} {$stContext}" ) );
+    }
+
+
+    /** @param mixed[] $context */
+    public function renderContext( array $context ) : string {
+        if ( empty( $context ) ) {
+            return '';
         }
-        $this->write( "{$stLevel}: {$stMessage}" );
+        if ( isset( $context[ 'code' ] ) && 0 === $context[ 'code' ] ) {
+            unset( $context[ 'code' ] );
+        }
+        return static::formatArray( $context );
+    }
+
+
+    /** @param mixed[] $context */
+    protected function renderLevel( mixed $level, array &$context ) : string {
+        $stLevel = strtoupper( static::normalizeLevelEx( $level, 'UNKNOWN' ) );
+        if ( isset( $context[ 'class' ] ) ) {
+            $stLevel .= '(' . $context[ 'class' ] . ')';
+            unset( $context[ 'class' ] );
+        }
+        return $stLevel;
+    }
+
+
+    protected function renderMessage( string|Stringable $stMessage ) : string {
+        return $stMessage instanceof Stringable ? $stMessage->__toString() : $stMessage;
     }
 
 

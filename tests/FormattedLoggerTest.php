@@ -4,7 +4,8 @@
 declare( strict_types = 1 );
 
 
-use JDWX\Log\StderrLogger;
+use JDWX\Log\FormattedLogger;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
@@ -12,12 +13,13 @@ use Psr\Log\LogLevel;
 require_once __DIR__ . '/MyFormattedLogger.php';
 
 
+#[CoversClass( FormattedLogger::class )]
 final class FormattedLoggerTest extends TestCase {
 
 
     public function testExceptionToArray() : void {
         $ex = new Exception( 'TEST_MESSAGE', 0, new LogicException( 'INNER_MESSAGE', 1 ) );
-        $exArray = StderrLogger::exceptionToArray( $ex );
+        $exArray = FormattedLogger::exceptionToArray( $ex );
         self::assertStringContainsString( 'TEST_MESSAGE', $exArray[ 'message' ] );
         self::assertStringContainsString( 'INNER_MESSAGE', $exArray[ 'previous' ][ 'message' ] );
         self::assertSame( 0, $exArray[ 'code' ] );
@@ -26,7 +28,7 @@ final class FormattedLoggerTest extends TestCase {
 
 
     public function testFormatArray() : void {
-        $result = StderrLogger::formatArray( [ 'message' => 'TEST_MESSAGE', 'foo' => 'bar' ] );
+        $result = FormattedLogger::formatArray( [ 'message' => 'TEST_MESSAGE', 'foo' => 'bar' ] );
         self::assertStringContainsString( 'TEST_MESSAGE', $result );
         self::assertStringContainsString( 'foo', $result );
         self::assertStringContainsString( 'bar', $result );
@@ -37,7 +39,7 @@ final class FormattedLoggerTest extends TestCase {
         $x = [ 'foo' => 'bar' ];
         $r = [ 'x' => & $x, 'baz' => 'qux' ];
         $x[ 'r' ] = $r;
-        $result = StderrLogger::formatArray( $x );
+        $result = FormattedLogger::formatArray( $x );
         self::assertStringContainsString( 'foo', $result );
         self::assertStringContainsString( 'bar', $result );
         self::assertStringContainsString( 'baz', $result );
@@ -51,7 +53,7 @@ final class FormattedLoggerTest extends TestCase {
         $x->foo = 'bar';
         $r = [ 'x' => $x, 'baz' => 'qux' ];
         $x->r = $r;
-        $result = StderrLogger::formatArray( [ 'x' => $x ] );
+        $result = FormattedLogger::formatArray( [ 'x' => $x ] );
         self::assertStringContainsString( 'foo', $result );
         self::assertStringContainsString( 'bar', $result );
         self::assertStringContainsString( 'baz', $result );
@@ -61,7 +63,7 @@ final class FormattedLoggerTest extends TestCase {
 
 
     public function testFormatArrayForNestedArray() : void {
-        $result = StderrLogger::formatArray( [ 'message' => 'TEST_MESSAGE', 'foo' => [ 'bar' => 'baz' ] ] );
+        $result = FormattedLogger::formatArray( [ 'message' => 'TEST_MESSAGE', 'foo' => [ 'bar' => 'baz' ] ] );
         self::assertStringContainsString( 'TEST_MESSAGE', $result );
         self::assertStringContainsString( 'foo', $result );
         self::assertStringContainsString( 'bar', $result );
@@ -72,7 +74,7 @@ final class FormattedLoggerTest extends TestCase {
     public function testFormatArrayForObject() : void {
         $x = new stdClass();
         $x->foo = 'bar';
-        $result = StderrLogger::formatArray( [ 'x' => $x ] );
+        $result = FormattedLogger::formatArray( [ 'x' => $x ] );
         self::assertStringContainsString( 'stdClass', $result );
         self::assertStringContainsString( 'foo', $result );
         self::assertStringContainsString( 'bar', $result );
@@ -84,7 +86,7 @@ final class FormattedLoggerTest extends TestCase {
         $x->foo = 'bar';
         $r = [ 'x' => $x ];
         $x->r = $r;
-        $result = StderrLogger::formatArray( $r );
+        $result = FormattedLogger::formatArray( $r );
         self::assertStringContainsString( 'stdClass', $result );
         self::assertStringContainsString( 'foo', $result );
         self::assertStringContainsString( 'bar', $result );
@@ -99,7 +101,7 @@ final class FormattedLoggerTest extends TestCase {
         $y->baz = 'qux';
         $x->y = $y;
         $y->x = $x;
-        $result = StderrLogger::formatArray( [ 'x' => $x ] );
+        $result = FormattedLogger::formatArray( [ 'x' => $x ] );
         self::assertStringContainsString( 'stdClass', $result );
         self::assertStringContainsString( 'foo', $result );
         self::assertStringContainsString( 'bar', $result );
@@ -119,6 +121,43 @@ final class FormattedLoggerTest extends TestCase {
         self::assertStringContainsString( 'TEST_MESSAGE', $logger->stWritten );
         self::assertStringContainsString( 'TEST_CLASS', $logger->stWritten );
         self::assertStringNotContainsString( '0', $logger->stWritten );
+    }
+
+
+    public function testLogDebug() : void {
+        $logger = new MyFormattedLogger();
+        $logger->debug( 'TEST_MESSAGE' );
+        self::assertStringContainsString( 'TEST_MESSAGE', $logger->stWritten );
+    }
+
+
+    public function testLogForEmptyContext() : void {
+        $logger = new MyFormattedLogger();
+        $logger->log( LogLevel::WARNING, 'TEST_MESSAGE' );
+        self::assertStringContainsString( 'WARNING', $logger->stWritten );
+        self::assertStringContainsString( 'TEST_MESSAGE', $logger->stWritten );
+    }
+
+
+    public function testLogInfo() : void {
+        $logger = new MyFormattedLogger();
+        $logger->info( 'TEST_MESSAGE' );
+        self::assertStringContainsString( 'TEST_MESSAGE', $logger->stWritten );
+    }
+
+
+    public function testLogInvalid() : void {
+        $logger = new MyFormattedLogger();
+        $logger->log( 'INVALID', 'TEST_MESSAGE' );
+        self::assertStringContainsString( 'UNKNOWN', $logger->stWritten );
+        self::assertStringContainsString( 'TEST_MESSAGE', $logger->stWritten );
+    }
+
+
+    public function testLogNotice() : void {
+        $logger = new MyFormattedLogger();
+        $logger->notice( 'TEST_MESSAGE' );
+        self::assertStringContainsString( 'TEST_MESSAGE', $logger->stWritten );
     }
 
 
