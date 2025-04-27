@@ -12,7 +12,9 @@ class StderrLogger extends FormattedLogger {
 
     /** @codeCoverageIgnore */
     protected function write( string $stMessage ) : void {
-        error_log( $stMessage );
+        foreach ( explode( "\n", $stMessage ) as $stLine ) {
+            error_log( $stLine );
+        }
     }
 
 
