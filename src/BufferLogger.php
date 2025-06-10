@@ -43,4 +43,13 @@ class BufferLogger implements LoggerInterface, Countable {
     }
 
 
+    public function shiftLogEx() : LogEntry {
+        $log = $this->shiftLog();
+        if ( $log instanceof LogEntry ) {
+            return $log;
+        }
+        throw new \RuntimeException( 'No log entry available' );
+    }
+
+
 }
