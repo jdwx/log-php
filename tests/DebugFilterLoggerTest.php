@@ -21,7 +21,7 @@ final class DebugFilterLoggerTest extends TestCase {
         $buf = new BufferLogger();
         $logger = new DebugFilterLogger( $buf );
         $logger->log( 'test', 'test message' );
-        $log = $buf->shiftLog();
+        $log = $buf->shiftLogEx();
         self::assertStringContainsString( 'message', $log->message );
 
         $logger->log( LOG_DEBUG, 'test message' );
