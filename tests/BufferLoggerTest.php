@@ -4,11 +4,15 @@
 declare( strict_types = 1 );
 
 
+namespace JDWX\Log\Tests;
+
+
 use JDWX\Log\BufferLogger;
 use JDWX\Log\LogEntry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
+use RuntimeException;
 
 
 #[CoversClass( BufferLogger::class )]
@@ -150,7 +154,7 @@ final class BufferLoggerTest extends TestCase {
         self::assertCount( 1, $log );
         $shifted = $log->shiftLogEx();
         self::assertSame( LogLevel::ALERT, $shifted->level );
-        $this->expectException( \RuntimeException::class );
+        $this->expectException( RuntimeException::class );
         $log->shiftLogEx();
     }
 

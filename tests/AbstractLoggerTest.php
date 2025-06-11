@@ -4,6 +4,10 @@
 declare( strict_types = 1 );
 
 
+namespace JDWX\Log\Tests;
+
+
+use InvalidArgumentException;
 use JDWX\Log\AbstractLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

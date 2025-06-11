@@ -4,6 +4,9 @@
 declare( strict_types = 1 );
 
 
+namespace JDWX\Log\Tests;
+
+
 use JDWX\Log\BufferLogger;
 use JDWX\Log\DebugFilterLogger;
 use PHPUnit\Framework\Attributes\CoversClass;

@@ -4,7 +4,13 @@
 declare( strict_types = 1 );
 
 
-class MyFormattedLogger extends JDWX\Log\FormattedLogger {
+namespace JDWX\Log\Tests;
+
+
+use JDWX\Log\FormattedLogger;
+
+
+class MyFormattedLogger extends FormattedLogger {
 
 
     public string $stWritten = '';

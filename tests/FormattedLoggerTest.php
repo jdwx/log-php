@@ -4,10 +4,16 @@
 declare( strict_types = 1 );
 
 
+namespace JDWX\Log\Tests;
+
+
 use JDWX\Log\FormattedLogger;
+use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
+use RuntimeException;
+use stdClass;
 
 
 require_once __DIR__ . '/MyFormattedLogger.php';
@@ -18,7 +24,7 @@ final class FormattedLoggerTest extends TestCase {
 
 
     public function testExceptionToArray() : void {
-        $ex = new Exception( 'TEST_MESSAGE', 0, new LogicException( 'INNER_MESSAGE', 1 ) );
+        $ex = new RuntimeException( 'TEST_MESSAGE', 0, new LogicException( 'INNER_MESSAGE', 1 ) );
         $exArray = FormattedLogger::exceptionToArray( $ex );
         self::assertStringContainsString( 'TEST_MESSAGE', $exArray[ 'message' ] );
         self::assertStringContainsString( 'INNER_MESSAGE', $exArray[ 'previous' ][ 'message' ] );
