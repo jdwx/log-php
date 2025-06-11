@@ -141,7 +141,7 @@ final class BufferLoggerTest extends TestCase {
         $log->alert( 'TEST_ALERT' );
         self::assertCount( 1, $log );
         $shifted = $log->shiftLog();
-        self::assertInstanceOf( LogEntry::class, $shifted );
+        assert( $shifted instanceof LogEntry );
         self::assertSame( LogLevel::ALERT, $shifted->level );
         self::assertSame( 'TEST_ALERT', $shifted->message );
         self::assertNull( $log->shiftLog() );
