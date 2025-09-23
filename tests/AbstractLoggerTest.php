@@ -18,6 +18,17 @@ use Psr\Log\LogLevel;
 final class AbstractLoggerTest extends TestCase {
 
 
+    public function testCompareLevels() : void {
+        self::assertSame( 0, AbstractLogger::compareLevels( 'emergency', LOG_EMERG ) );
+        self::assertSame( 1, AbstractLogger::compareLevels( 'alert', 'emergency' ) );
+        self::assertSame( -1, AbstractLogger::compareLevels( 'CRITICAL', 'Error' ) );
+        self::assertSame( 0, AbstractLogger::compareLevels( LOG_WARNING, 'wArNing ' ) );
+        self::assertSame( -1, AbstractLogger::compareLevels( 'notICE', LOG_INFO ) );
+        $this->expectException( InvalidArgumentException::class );
+        self::assertSame( 1, AbstractLogger::compareLevels( LOG_DEBUG, 'invalid' ) );
+    }
+
+
     public function testNormalizeLevel() : void {
         self::assertSame( LogLevel::EMERGENCY, AbstractLogger::normalizeLevel( 'emergency' ) );
         self::assertSame( LogLevel::ALERT, AbstractLogger::normalizeLevel( 'alert' ) );
@@ -36,6 +47,28 @@ final class AbstractLoggerTest extends TestCase {
         self::assertSame( LogLevel::EMERGENCY, AbstractLogger::normalizeLevelEx( 'emergency' ) );
         $this->expectException( InvalidArgumentException::class );
         AbstractLogger::normalizeLevelEx( 12345 );
+    }
+
+
+    public function testNormalizeLevelInt() : void {
+        self::assertSame( 0, AbstractLogger::normalizeLevelInt( 'emergency' ) );
+        self::assertSame( 1, AbstractLogger::normalizeLevelInt( 'alert' ) );
+        self::assertSame( 2, AbstractLogger::normalizeLevelInt( 'CRITICAL' ) );
+        self::assertSame( 3, AbstractLogger::normalizeLevelInt( 'Error' ) );
+        self::assertSame( 4, AbstractLogger::normalizeLevelInt( 'wArNing ' ) );
+        self::assertSame( 5, AbstractLogger::normalizeLevelInt( 'notICE' ) );
+        self::assertSame( 6, AbstractLogger::normalizeLevelInt( LOG_INFO ) );
+        self::assertSame( 7, AbstractLogger::normalizeLevelInt( LOG_DEBUG ) );
+        self::assertNull( AbstractLogger::normalizeLevelInt( 'invalid' ) );
+        self::assertSame( 42, AbstractLogger::normalizeLevelInt( 'invalid', 42 ) );
+        self::assertSame( 12345, AbstractLogger::normalizeLevelInt( 12345 ) );
+    }
+
+
+    public function testNormalizeLevelIntEx() : void {
+        self::assertSame( 0, AbstractLogger::normalizeLevelIntEx( 'emergency' ) );
+        $this->expectException( InvalidArgumentException::class );
+        AbstractLogger::normalizeLevelIntEx( 12.34 );
     }
 
 
