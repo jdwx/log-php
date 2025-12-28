@@ -11,7 +11,7 @@ use Psr\Log\LogLevel;
 use Stringable;
 
 
-readonly class LogEntry {
+readonly class LogEntry implements Stringable {
 
 
     public string $level;
@@ -37,6 +37,11 @@ readonly class LogEntry {
         };
         $this->message = strval( $i_stMessage );
         $this->context = $i_rContext;
+    }
+
+
+    public function __toString() : string {
+        return "[{$this->level}] {$this->message}";
     }
 
 

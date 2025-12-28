@@ -79,4 +79,10 @@ class LogEntryTest extends TestCase {
     }
 
 
+    public function testToString() : void {
+        $logEntry = new LogEntry( LOG_INFO, 'test message', [] );
+        self::assertSame( '[info] test message', strval( $logEntry ) );
+    }
+
+
 }
