@@ -1,6 +1,6 @@
 {
   "name": "jdwx/log",
-  "description": "A simple PHP framework for logging.",
+  "description": "A simple PHP framework for logging with optional telemetry.",
   "license": "MIT",
   "autoload": {
     "psr-4": {

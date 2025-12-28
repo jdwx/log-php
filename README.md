@@ -1,4 +1,5 @@
 # log-php
+
 A simple PHP module for logging.
 
 This provides some commonly-used logging functionality, like being able to relay LoggerInterface functionality between objects.
@@ -49,8 +50,12 @@ There are many unit tests for this module which provide additional examples of u
 
 ## Stability
 
-This module is considered stable and is used in production code. The test coverage is complete except for testing StderrLogger.
+This main module is considered stable and is used in production code. The test coverage is complete.
+
+The Telemetry code is considered experimental and may change in future releases. (When it stabilizes, it will either be moved to a separate module or a major version increment will occur.)
 
 ## History
 
 This module was refactored from [jdwx/app](https://github.com/jdwx/app) in January 2025 to better support web-based applications.
+
+Rudimentary telemetry functionality was added in December 2025.
