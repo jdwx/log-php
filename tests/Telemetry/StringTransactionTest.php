@@ -8,7 +8,7 @@ namespace JDWX\Log\Tests\Telemetry;
 
 
 use JDWX\Json\Json;
-use JDWX\Log\Telemetry\ParentNode;
+use JDWX\Log\Telemetry\AbstractTransaction;
 use JDWX\Log\Telemetry\StringTransaction;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +16,7 @@ use Psr\Log\LogLevel;
 use ReflectionClass;
 
 
-#[CoversClass( ParentNode::class )]
+#[CoversClass( AbstractTransaction::class )]
 #[CoversClass( StringTransaction::class )]
 final class StringTransactionTest extends TestCase {
 
@@ -41,8 +41,11 @@ final class StringTransactionTest extends TestCase {
     public function testToStringForEmpty() : void {
         $tx = new StringTransaction();
         $st = strval( $tx );
-        self::assertIsString( $st );
-        self::assertSame( '', $st );
+        $r = Json::decode( $st );
+        self::assertArrayHasKey( 'startTime', $r );
+        self::assertArrayHasKey( 'endTime', $r );
+        self::assertArrayHasKey( 'duration', $r );
+        self::assertCount( 3, $r );
     }
 
 

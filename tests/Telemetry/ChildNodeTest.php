@@ -18,9 +18,19 @@ final class ChildNodeTest extends TestCase {
 
 
     public function testFinish() : void {
+        $parent = new ParentNode();
+        $child = new ChildNode( $parent );
+        $parent->pushChild( $child );
+        self::assertSame( $child, $parent->getChild() );
+        $child->finish();
+        self::assertNull( $parent->getChild() );
+    }
+
+
+    public function testParent() : void {
         $tx = new ParentNode();
         $child = new ChildNode( $tx );
-        $tx2 = $child->finish();
+        $tx2 = $child->parent();
         self::assertSame( $tx, $tx2 );
     }
 

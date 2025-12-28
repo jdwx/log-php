@@ -32,11 +32,18 @@ final class NodeTest extends TestCase {
     }
 
 
+    public function testAddContextAfterFinish() : void {
+        $node = new Node();
+        $node->finish();
+        $this->expectException( \LogicException::class );
+        $node->addContext( [ 'foo' => 'bar' ] );
+    }
+
+
     public function testLog() : void {
         $node = new Node();
         $node->info( 'Info message.', [ 'foo' => 'bar' ] );
         $r = $node->contextSerialize();
-        assert( is_array( $r ) );
         $log = $r[ 0 ];
         assert( is_array( $log ) );
         self::assertSame( 'Info message.', $log[ 'message' ] );
@@ -45,16 +52,17 @@ final class NodeTest extends TestCase {
     }
 
 
-    public function testLogWithSpan() : void {
+    public function testLogWithChild() : void {
         $tx = new StringTransaction();
         $tx->startChild();
-        $tx->info( 'Info message in span.', [ 'foo' => 'bar' ] );
+        $tx->info( 'Info message in child.', [ 'foo' => 'bar' ] );
         $tx->finish();
         $r = $tx->contextSerialize();
-        assert( is_array( $r ) );
-        $log = $r[ 0 ][ 0 ];
+        $rChild = $r[ 0 ];
+        assert( is_array( $rChild ) );
+        $log = $rChild[ 0 ];
         assert( is_array( $log ) );
-        self::assertSame( 'Info message in span.', $log[ 'message' ] );
+        self::assertSame( 'Info message in child.', $log[ 'message' ] );
         self::assertSame( LogLevel::INFO, $log[ 'level' ] );
         self::assertSame( 'bar', $log[ 'context' ][ 'foo' ] );
     }
@@ -86,11 +94,27 @@ final class NodeTest extends TestCase {
     }
 
 
+    public function testPushAfterFinish() : void {
+        $node = new Node();
+        $node->finish();
+        $this->expectException( \LogicException::class );
+        $node->push( 'foo' );
+    }
+
+
     public function testSetContext() : void {
         $node = new Node();
         $node->setContext( 'foo', 'bar' );
         $r = $node->getContext();
         self::assertSame( 'bar', $r[ 'foo' ] );
+    }
+
+
+    public function testSetContextAfterFinish() : void {
+        $node = new Node();
+        $node->finish();
+        $this->expectException( \LogicException::class );
+        $node->setContext( 'foo', 'bar' );
     }
 
 

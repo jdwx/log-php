@@ -11,10 +11,10 @@ use JDWX\Json\Json;
 use Stringable;
 
 
-class StringTransaction extends ParentNode implements TransactionInterface, Stringable {
+class StringTransaction extends AbstractTransaction implements Stringable {
 
 
-    private string $string;
+    private string $string = '';
 
     private bool $bFinished = false;
 
@@ -27,13 +27,9 @@ class StringTransaction extends ParentNode implements TransactionInterface, Stri
     }
 
 
-    public function finish() : void {
+    protected function commit() : void {
         $this->bFinished = true;
         $r = $this->contextSerialize();
-        if ( empty( $r ) ) {
-            $this->string = '';
-            return;
-        }
         $this->string = Json::encodePretty( $r );
     }
 

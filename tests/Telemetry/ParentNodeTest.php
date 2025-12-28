@@ -17,20 +17,57 @@ use Psr\Log\LogLevel;
 final class ParentNodeTest extends TestCase {
 
 
+    public function testAddContext() : void {
+        $tx = new ParentNode();
+        $tx->addContext( [
+            'foo' => 'bar',
+            'baz' => 42,
+        ] );
+        $child = $tx->startChild();
+        $tx->addContext( [
+            'qux' => 'quux',
+        ] );
+        $tx->finishChild();
+        $tx->addContext( [
+            'corge' => 'grault',
+        ] );
+        $r = $tx->getContext();
+        self::assertSame( [
+            'foo' => 'bar',
+            'baz' => 42,
+            'corge' => 'grault',
+        ], $r );
+        self::assertSame( [
+            'qux' => 'quux',
+        ], $child->getContext() );
+    }
+
+
+    public function testGetChild() : void {
+        $tx = new ParentNode();
+        self::assertNull( $tx->getChild() );
+        $child = $tx->startChild();
+        self::assertSame( $child, $tx->getChild() );
+        $tx->finishChild();
+        self::assertNull( $tx->getChild() );
+    }
+
+
     public function testLog() : void {
         $tx = new ParentNode();
         $tx->info( 'Info message before child.', [ 'foo' => 'bar' ] );
-        $span = $tx->startChild();
+        $child = $tx->startChild();
         $tx->info( 'Info message in child.', [ 'foo' => 'bar' ] );
-        $span->finish();
+        $child->finish();
         $tx->info( 'Info message after child.', [ 'foo' => 'baz' ] );
         $r = $tx->contextSerialize();
-        assert( is_array( $r ) );
-        $logSpan = $r[ 1 ][ 0 ];
-        assert( is_array( $logSpan ) );
-        self::assertSame( 'Info message in child.', $logSpan[ 'message' ] );
-        self::assertSame( LogLevel::INFO, $logSpan[ 'level' ] );
-        self::assertSame( 'bar', $logSpan[ 'context' ][ 'foo' ] );
+        $rChild = $r[ 1 ];
+        assert( is_array( $rChild ) );
+        $logChild = $rChild[ 0 ];
+        assert( is_array( $logChild ) );
+        self::assertSame( 'Info message in child.', $logChild[ 'message' ] );
+        self::assertSame( LogLevel::INFO, $logChild[ 'level' ] );
+        self::assertSame( 'bar', $logChild[ 'context' ][ 'foo' ] );
         $log = $r[ 2 ];
         assert( is_array( $log ) );
         self::assertSame( 'Info message after child.', $log[ 'message' ] );
@@ -44,10 +81,9 @@ final class ParentNodeTest extends TestCase {
         $tx->startChild();
         $tx->setContext( 'foo', 'bar' );
         $r = $tx->contextSerialize();
-        assert( is_array( $r ) );
-        $spanContext = $r[ 0 ];
-        assert( is_array( $spanContext ) );
-        self::assertSame( 'bar', $spanContext[ 'foo' ] );
+        $childContext = $r[ 0 ];
+        assert( is_array( $childContext ) );
+        self::assertSame( 'bar', $childContext[ 'foo' ] );
     }
 
 

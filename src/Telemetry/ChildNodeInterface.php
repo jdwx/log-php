@@ -10,7 +10,7 @@ namespace JDWX\Log\Telemetry;
 interface ChildNodeInterface extends NodeInterface {
 
 
-    public function finish() : ParentNodeInterface;
+    public function parent() : ParentNodeInterface;
 
 
 }

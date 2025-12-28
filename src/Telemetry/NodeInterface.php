@@ -18,6 +18,9 @@ interface NodeInterface extends LoggerInterface, ContextSerializable {
     public function addContext( array $i_rContext ) : void;
 
 
+    public function finish() : void;
+
+
     /** @return array<string, mixed[]|bool|float|int|string|ContextSerializable|\JsonSerializable|\Stringable|null> */
     public function getContext() : array;
 
