@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log\Tests\Telemetry;
 
 
+use JDWX\Log\ContextSerializable;
 use JDWX\Log\Telemetry\Node;
 use JDWX\Log\Telemetry\StringTransaction;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -115,6 +116,28 @@ final class NodeTest extends TestCase {
         $node->finish();
         $this->expectException( \LogicException::class );
         $node->setContext( 'foo', 'bar' );
+    }
+
+
+    public function testSetContextForContextSerializable() : void {
+        $obj = new class implements ContextSerializable {
+
+
+            /** @return array<string, string> */
+            public function contextSerialize() : array {
+                return [ 'foo' => 'bar' ];
+            }
+
+
+        };
+        $node = new Node();
+        $node->setContext( 'baz', $obj );
+        $r = $node->contextSerialize();
+        /** @phpstan-ignore-next-line */
+        assert( is_array( $r ) );
+        self::assertArrayHasKey( 'baz', $r );
+        assert( is_array( $r[ 'baz' ] ) );
+        self::assertSame( 'bar', $r[ 'baz' ][ 'foo' ] );
     }
 
 

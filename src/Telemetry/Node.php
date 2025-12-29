@@ -52,7 +52,7 @@ class Node implements NodeInterface {
 
     /** @return array<int|string, mixed[]|bool|float|int|string|null> */
     public function contextSerialize() : array {
-        $r = $this->getContext();
+        $r = self::serialize( $this->getContext() );
         foreach ( $this->rChildren as $child ) {
             $r[] = self::serialize( $child );
         }
