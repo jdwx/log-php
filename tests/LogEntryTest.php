@@ -79,6 +79,24 @@ class LogEntryTest extends TestCase {
     }
 
 
+    public function testLevelToString() : void {
+        self::assertSame( LogLevel::INFO, LogEntry::levelToString( LOG_INFO ) );
+        self::assertSame( LogLevel::ERROR, LogEntry::levelToString( LOG_ERR ) );
+        self::assertSame( LogLevel::DEBUG, LogEntry::levelToString( 'debug' ) );
+        self::assertSame( LogLevel::DEBUG, LogEntry::levelToString( 'Debug' ) );
+        self::assertSame( LogLevel::DEBUG, LogEntry::levelToString( 'DEBUG' ) );
+        self::assertNull( LogEntry::levelToString( 9999 ) );
+    }
+
+
+    public function testLevelToStringEx() : void {
+        self::assertSame( LogLevel::INFO, LogEntry::levelToStringEx( LOG_INFO ) );
+        self::assertSame( LogLevel::ERROR, LogEntry::levelToStringEx( LOG_ERR ) );
+        $this->expectException( \InvalidArgumentException::class );
+        LogEntry::levelToStringEx( 9999 );
+    }
+
+
     public function testToString() : void {
         $logEntry = new LogEntry( LOG_INFO, 'test message', [] );
         self::assertSame( '[info] test message', strval( $logEntry ) );

@@ -24,7 +24,17 @@ readonly class LogEntry implements Stringable {
 
     /** @param mixed[] $i_rContext */
     public function __construct( int|string $i_level, string|Stringable $i_stMessage, array $i_rContext ) {
-        $this->level = match ( $i_level ) {
+        $this->level = self::levelToString( $i_level ) ?? "INVALID({$i_level})";
+        $this->message = strval( $i_stMessage );
+        $this->context = $i_rContext;
+    }
+
+
+    public static function levelToString( int|string $i_level ) : ?string {
+        if ( is_string( $i_level ) ) {
+            $i_level = strtolower( trim( $i_level ) );
+        }
+        return match ( $i_level ) {
             LogLevel::EMERGENCY, LOG_EMERG => LogLevel::EMERGENCY,
             LogLevel::ALERT, LOG_ALERT => LogLevel::ALERT,
             LogLevel::CRITICAL, LOG_CRIT => LogLevel::CRITICAL,
@@ -33,10 +43,17 @@ readonly class LogEntry implements Stringable {
             LogLevel::NOTICE, LOG_NOTICE => LogLevel::NOTICE,
             LogLevel::INFO, LOG_INFO => LogLevel::INFO,
             LogLevel::DEBUG, LOG_DEBUG => LogLevel::DEBUG,
-            default => "INVALID({$i_level})",
+            default => null,
         };
-        $this->message = strval( $i_stMessage );
-        $this->context = $i_rContext;
+    }
+
+
+    public static function levelToStringEx( int|string $i_level ) : string {
+        $stLevel = self::levelToString( $i_level );
+        if ( is_string( $stLevel ) ) {
+            return $stLevel;
+        }
+        throw new \InvalidArgumentException( "Invalid log level: {$i_level}" );
     }
 
 
