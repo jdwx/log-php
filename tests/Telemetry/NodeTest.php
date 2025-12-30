@@ -41,6 +41,14 @@ final class NodeTest extends TestCase {
     }
 
 
+    public function testIsFinished() : void {
+        $node = new Node();
+        self::assertFalse( $node->isFinished() );
+        $node->finish();
+        self::assertTrue( $node->isFinished() );
+    }
+
+
     public function testLog() : void {
         $node = new Node();
         $node->info( 'Info message.', [ 'foo' => 'bar' ] );

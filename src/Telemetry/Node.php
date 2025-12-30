@@ -76,6 +76,11 @@ class Node implements NodeInterface {
     }
 
 
+    public function isFinished() : bool {
+        return $this->bFinished;
+    }
+
+
     public function log( $level, Stringable|string $message, array $context = [] ) : void {
         $this->push( new TimestampedLogEntry( $level, $message, $context ) );
     }
