@@ -101,7 +101,9 @@ class Node implements NodeInterface {
         if ( $this->bFinished ) {
             throw new \LogicException( 'Telemetry node context set after finish.' );
         }
-        $this->rContext[ $i_stKey ] = $i_value;
+        # Serialize here to ensure that later changes to $i_value (like deleting an underlying database
+        # row) do not invalidate our context.
+        $this->rContext[ $i_stKey ] = self::serialize( $i_value );
     }
 
 
