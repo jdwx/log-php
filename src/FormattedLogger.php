@@ -8,13 +8,14 @@ namespace JDWX\Log;
 
 
 use Stringable;
+use Throwable;
 
 
 abstract class FormattedLogger extends AbstractLogger {
 
 
     /** @return array<string, mixed> */
-    public static function exceptionToArray( \Throwable $x ) : array {
+    public static function exceptionToArray( Throwable $x ) : array {
         $r = [
             'class' => get_class( $x ),
             'message' => $x->getMessage(),
@@ -24,7 +25,7 @@ abstract class FormattedLogger extends AbstractLogger {
             'trace' => $x->getTraceAsString(),
         ];
         $prev = $x->getPrevious();
-        if ( $prev instanceof \Throwable ) {
+        if ( $prev instanceof Throwable ) {
             $r[ 'previous' ] = static::exceptionToArray( $prev );
         }
         return $r;
@@ -120,6 +121,9 @@ abstract class FormattedLogger extends AbstractLogger {
     public function renderContext( array $context ) : string {
         if ( empty( $context ) ) {
             return '';
+        }
+        if ( isset( $context[ 'exception' ] ) && $context[ 'exception' ] instanceof Throwable ) {
+            $context[ 'exception' ] = self::exceptionToArray( $context[ 'exception' ] );
         }
         if ( isset( $context[ 'code' ] ) && 0 === $context[ 'code' ] ) {
             unset( $context[ 'code' ] );

@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log\Tests;
 
 
+use Exception;
 use JDWX\Log\FormattedLogger;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -180,6 +181,13 @@ final class FormattedLoggerTest extends TestCase {
         $logger = new MyFormattedLogger();
         $logger->notice( 'TEST_MESSAGE' );
         self::assertStringContainsString( 'TEST_MESSAGE', $logger->stWritten );
+    }
+
+
+    public function testRenderContext() : void {
+        $logger = new MyFormattedLogger();
+        $result = $logger->renderContext( [ 'exception' => new Exception( 'Test exception' ) ] );
+        self::assertStringContainsString( 'class: Exception', $result );
     }
 
 
