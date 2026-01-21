@@ -13,7 +13,6 @@ use JDWX\Log\Telemetry\StringTransaction;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
-use ReflectionClass;
 
 
 #[CoversClass( AbstractTransaction::class )]
@@ -23,10 +22,9 @@ final class StringTransactionTest extends TestCase {
 
     public function testFinish() : void {
         $tx = new StringTransaction();
-        $ref = new ReflectionClass( $tx );
-        self::assertFalse( $ref->getProperty( 'bFinished' )->getValue( $tx ) );
+        self::assertFalse( $tx->isFinished() );
         $tx->finish();
-        self::assertTrue( $ref->getProperty( 'bFinished' )->getValue( $tx ) );
+        self::assertTrue( $tx->isFinished() );
     }
 
 

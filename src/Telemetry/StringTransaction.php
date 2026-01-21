@@ -16,11 +16,9 @@ class StringTransaction extends AbstractTransaction implements Stringable {
 
     private string $string = '';
 
-    private bool $bFinished = false;
-
 
     public function __toString() : string {
-        if ( ! $this->bFinished ) {
+        if ( ! $this->isFinished() ) {
             $this->finish();
         }
         return $this->string;
@@ -28,7 +26,6 @@ class StringTransaction extends AbstractTransaction implements Stringable {
 
 
     protected function commit() : void {
-        $this->bFinished = true;
         $r = $this->contextSerialize();
         $this->string = Json::encodePretty( $r );
     }
