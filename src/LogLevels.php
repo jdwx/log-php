@@ -111,7 +111,7 @@ final class LogLevels {
         if ( is_int( $iLevel ) ) {
             return $iLevel;
         }
-        throw new \InvalidArgumentException( "Invalid log level: {$i_level}" );
+        throw new InvalidArgumentException( "Invalid log level: {$i_level}" );
     }
 
 

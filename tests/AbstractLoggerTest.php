@@ -7,10 +7,10 @@ declare( strict_types = 1 );
 namespace JDWX\Log\Tests;
 
 
-use InvalidArgumentException;
 use JDWX\Log\AbstractLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
 
 
@@ -78,6 +78,8 @@ final class AbstractLoggerTest extends TestCase {
         self::assertNull( AbstractLogger::normalizeLevelInt( 'invalid' ) );
         self::assertSame( 42, AbstractLogger::normalizeLevelInt( 'invalid', 42 ) );
         self::assertSame( 12345, AbstractLogger::normalizeLevelInt( 12345 ) );
+        $this->expectException( InvalidArgumentException::class );
+        AbstractLogger::normalizeLevelInt( 3.14 );
     }
 
 
@@ -87,6 +89,26 @@ final class AbstractLoggerTest extends TestCase {
      */
     public function testNormalizeLevelIntEx() : void {
         self::assertSame( 0, AbstractLogger::normalizeLevelIntEx( 'emergency' ) );
+        self::assertSame( 7, AbstractLogger::normalizeLevelIntEx( LOG_DEBUG ) );
+        self::assertSame( 12345, AbstractLogger::normalizeLevelIntEx( 12345 ) );
+    }
+
+
+    /**
+     * @noinspection PhpDeprecationInspection
+     * @suppress PhanDeprecatedFunction
+     */
+    public function testNormalizeLevelIntExForBadValue() : void {
+        $this->expectException( InvalidArgumentException::class );
+        AbstractLogger::normalizeLevelIntEx( 'invalid' );
+    }
+
+
+    /**
+     * @noinspection PhpDeprecationInspection
+     * @suppress PhanDeprecatedFunction
+     */
+    public function testNormalizeLevelIntExForWrongType() : void {
         $this->expectException( InvalidArgumentException::class );
         AbstractLogger::normalizeLevelIntEx( 12.34 );
     }
