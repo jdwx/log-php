@@ -12,12 +12,13 @@ use Psr\Log\LoggerInterface;
 
 
 /**
- * Adds a timestamp to each log message.
+ * Adds a timestamp to each log message. This is most useful in conjunction with
+ * StderrLogger, which just dumps the log to stderr without decoration.
  */
 class TimestampLogger extends AbstractLogger {
 
 
-    public function __construct( private readonly LoggerInterface $parent ) {}
+    public function __construct( private readonly LoggerInterface $parent, private readonly string $format = '[Y-m-d H:i:s] ' ) {}
 
 
     /**
@@ -27,7 +28,7 @@ class TimestampLogger extends AbstractLogger {
      * @suppress PhanTypeMismatchDeclaredParamNullable
      */
     public function log( $level, \Stringable|string $message, array $context = [] ) : void {
-        $message = gmdate( '[Y-m-d H:i:s] ' ) . $message;
+        $message = gmdate( $this->format ) . $message;
         $this->parent->log( $level, $message, $context );
     }
 
