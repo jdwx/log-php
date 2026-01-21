@@ -79,6 +79,28 @@ class LogEntryTest extends TestCase {
     }
 
 
+    public function testContext() : void {
+        $context = [ 'key' => 'value' ];
+        $logEntry = new LogEntry( LOG_INFO, 'test', $context );
+        self::assertSame( $context, $logEntry->context() );
+    }
+
+
+    public function testLevel() : void {
+        $logEntry = new LogEntry( LOG_INFO, 'test', [] );
+        self::assertSame( LogLevel::INFO, $logEntry->level() );
+
+        $logEntry = new LogEntry( LogLevel::ERROR, 'test', [] );
+        self::assertSame( LogLevel::ERROR, $logEntry->level() );
+    }
+
+
+    public function testMessage() : void {
+        $logEntry = new LogEntry( LOG_INFO, 'test message', [] );
+        self::assertSame( 'test message', $logEntry->message() );
+    }
+
+
     public function testToString() : void {
         $logEntry = new LogEntry( LOG_INFO, 'test message', [] );
         self::assertSame( '[info] test message', strval( $logEntry ) );

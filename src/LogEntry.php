@@ -10,7 +10,7 @@ namespace JDWX\Log;
 use Stringable;
 
 
-readonly class LogEntry implements Stringable {
+readonly class LogEntry implements Stringable, LogEntryInterface {
 
 
     public string $level;
@@ -31,6 +31,22 @@ readonly class LogEntry implements Stringable {
 
     public function __toString() : string {
         return "[{$this->level}] {$this->message}";
+    }
+
+
+    /** @return mixed[] */
+    public function context() : array {
+        return $this->context;
+    }
+
+
+    public function level() : string {
+        return $this->level;
+    }
+
+
+    public function message() : string {
+        return $this->message;
     }
 
 
