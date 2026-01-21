@@ -15,10 +15,43 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
+use RuntimeException;
 
 
 #[CoversClass( LoggerFinder::class )]
 final class LoggerFinderTest extends TestCase {
+
+
+    public function testFind() : void {
+        $buffer = new BufferLogger();
+        $buffer2 = new BufferLogger();
+        self::assertNull( LoggerFinder::find( 1, 'foo', null, 8.1, $this ) );
+        self::assertSame( $buffer, LoggerFinder::find( 1, 'foo', $buffer, null, 8.1, $this, $buffer2 ) );
+
+        LoggerRegistry::register( $buffer );
+        self::assertSame( $buffer, LoggerFinder::find( 1, 'foo', null, 8.1, $this ) );
+    }
+
+
+    public function testFindEx() : void {
+        $buffer = new BufferLogger();
+        $buffer2 = new BufferLogger();
+        self::assertSame( $buffer, LoggerFinder::findEx( self::class, 1, 'foo', $buffer, null, 8.1, $this, $buffer2 ) );
+
+        $this->expectException( RuntimeException::class );
+        LoggerFinder::findEx( self::class, 1, 'foo', null, 8.1, $this );
+    }
+
+
+    public function testGetLoggerEx() : void {
+        $buffer = new BufferLogger();
+        $finder = new LoggerFinder( $buffer );
+        self::assertSame( $buffer, $finder->getLoggerEx( self::class ) );
+
+        $finder = new LoggerFinder();
+        $this->expectException( RuntimeException::class );
+        $finder->getLoggerEx( self::class );
+    }
 
 
     public function testGetLoggerForConstructor() : void {
@@ -135,6 +168,21 @@ final class LoggerFinderTest extends TestCase {
         self::assertSame( $buffer, $finder->getLogger() );
         $finder->try( $this );
         self::assertSame( $buffer, $finder->getLogger() );
+    }
+
+
+    public function testTryWithSeveral() : void {
+        $finder = new LoggerFinder();
+        $buffer = new BufferLogger();
+        $buffer2 = new BufferLogger();
+        $finder->try( 1, 'nope', 3.14, $buffer, null, $buffer2 );
+        self::assertSame( $buffer, $finder->getLogger() );
+    }
+
+
+    protected function setUp() : void {
+        parent::setUp();
+        LoggerRegistry::clear();
     }
 
 

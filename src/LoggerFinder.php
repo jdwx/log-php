@@ -34,14 +34,49 @@ class LoggerFinder implements HasLoggerInterface {
                                  private readonly string  $stRegistryId = LoggerRegistry::DEFAULT_LOGGER_ID ) {}
 
 
+    /**
+     * @param mixed ...$rOptions All options to try to find a logger, in order of preference.
+     * @return LoggerInterface|null
+     */
+    public static function find( mixed ...$rOptions ) : ?LoggerInterface {
+        return ( new self() )->try( ...$rOptions )->getLogger();
+    }
+
+
+    /**
+     * @param string $i_stClass The class that insists on having a logger available.
+     * @param mixed ...$rOptions All options to try to find a logger, in order of preference.
+     * @return LoggerInterface
+     */
+    public static function findEx( string $i_stClass, mixed ...$rOptions ) : LoggerInterface {
+        return ( new self() )->try( ...$rOptions )->getLoggerEx( $i_stClass );
+    }
+
+
     public function getLogger() : ?LoggerInterface {
         $this->lastDitchEffort();
         return $this->logger;
     }
 
 
-    public function try( mixed $x ) : void {
-        $this->logger ??= $this->unwind( $x );
+    /**
+     * @param string $i_stClass The class that insists on having a logger available.
+     * @return LoggerInterface
+     */
+    public function getLoggerEx( string $i_stClass ) : LoggerInterface {
+        $logger = $this->getLogger();
+        if ( $logger instanceof LoggerInterface ) {
+            return $logger;
+        }
+        throw new \RuntimeException( "A logger is required by {$i_stClass}, but none could be found." );
+    }
+
+
+    public function try( mixed ...$rOptions ) : static {
+        foreach ( $rOptions as $x ) {
+            $this->logger ??= $this->unwind( $x );
+        }
+        return $this;
     }
 
 
