@@ -7,14 +7,10 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
-use Psr\Log\LoggerTrait;
 use Stringable;
 
 
 abstract class FormattedLogger extends AbstractLogger {
-
-
-    use LoggerTrait;
 
 
     /** @return array<string, mixed> */
