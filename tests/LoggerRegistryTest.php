@@ -19,9 +19,9 @@ final class LoggerRegistryTest extends TestCase {
 
     public function testGetForAlt() : void {
         $buffer = new BufferLogger();
-        LoggerRegistry::register( $buffer, 'jdwx.logger.alt' );
+        LoggerRegistry::register( $buffer, 'jdwx.log.alt' );
         self::assertNull( LoggerRegistry::get() );
-        self::assertSame( $buffer, LoggerRegistry::get( 'jdwx.logger.alt' ) );
+        self::assertSame( $buffer, LoggerRegistry::get( 'jdwx.log.alt' ) );
     }
 
 
@@ -34,7 +34,7 @@ final class LoggerRegistryTest extends TestCase {
         $buffer = new BufferLogger();
         LoggerRegistry::register( $buffer );
         self::assertSame( $buffer, LoggerRegistry::get() );
-        self::assertNull( LoggerRegistry::get( 'jdwx.logger.no-such-logger' ) );
+        self::assertNull( LoggerRegistry::get( 'jdwx.log.no-such-logger' ) );
     }
 
 

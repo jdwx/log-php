@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
 class LoggerRegistry {
 
 
-    public const DEFAULT_LOGGER_ID = 'jdwx.logger.default';
+    public const DEFAULT_LOGGER_ID = 'jdwx.log.default';
 
 
     /** @var array<string, LoggerInterface> */

@@ -10,6 +10,7 @@ namespace JDWX\Log\Tests;
 use JDWX\Log\BufferLogger;
 use JDWX\Log\HasLoggerInterface;
 use JDWX\Log\LoggerFinder;
+use JDWX\Log\LoggerRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -90,6 +91,23 @@ final class LoggerFinderTest extends TestCase {
     public function testGetLoggerForNothing() : void {
         $finder = new LoggerFinder();
         self::assertNull( $finder->getLogger() );
+    }
+
+
+    public function testGetLoggerForRegistry() : void {
+        $finder = new LoggerFinder( stRegistryId: 'jdwx.log.foo' );
+        self::assertNull( $finder->getLogger() );
+        $buffer = new BufferLogger();
+        LoggerRegistry::register( $buffer, 'jdwx.log.foo' );
+        self::assertSame( $buffer, $finder->getLogger() );
+
+        $finder = new LoggerFinder( stRegistryId: 'jdwx.log.foo' );
+        $buffer2 = new BufferLogger();
+        $finder->try( $buffer2 );
+        self::assertSame( $buffer2, $finder->getLogger() );
+
+        $finder = new LoggerFinder( $buffer2, 'jdwx.log.foo' );
+        self::assertSame( $buffer2, $finder->getLogger() );
     }
 
 

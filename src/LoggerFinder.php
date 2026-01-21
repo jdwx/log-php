@@ -30,16 +30,26 @@ use Psr\Log\LoggerInterface;
 class LoggerFinder implements HasLoggerInterface {
 
 
-    public function __construct( private ?LoggerInterface $logger = null ) {}
+    public function __construct( private ?LoggerInterface $logger = null,
+                                 private readonly string  $stRegistryId = LoggerRegistry::DEFAULT_LOGGER_ID ) {}
 
 
     public function getLogger() : ?LoggerInterface {
+        $this->lastDitchEffort();
         return $this->logger;
     }
 
 
     public function try( mixed $x ) : void {
         $this->logger ??= $this->unwind( $x );
+    }
+
+
+    protected function lastDitchEffort() : void {
+        if ( $this->logger instanceof LoggerInterface ) {
+            return;
+        }
+        $this->logger = LoggerRegistry::get( $this->stRegistryId );
     }
 
 
