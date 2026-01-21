@@ -22,6 +22,14 @@ class LogLevelsTest extends TestCase {
     }
 
 
+    public function testIsValid() : void {
+        self::assertTrue( LogLevels::isValid( LogLevel::DEBUG ) );
+        self::assertTrue( LogLevels::isValid( LOG_DEBUG ) );
+        self::assertFalse( LogLevels::isValid( 'unknown' ) );
+        self::assertFalse( LogLevels::isValid( 9999 ) );
+    }
+
+
     public function testMax() : void {
         self::assertSame( LogLevel::DEBUG, LogLevels::leastSevere( LogLevel::DEBUG, LogLevel::INFO ) );
         self::assertSame( LOG_WARNING, LogLevels::leastSevere( LogLevel::ERROR, LOG_WARNING ) );
