@@ -21,8 +21,9 @@ abstract class FilterLogger extends AbstractLogger {
      * @param string|\Stringable $message
      * @param mixed[] $context
      * @return void
+     * @suppress PhanTypeMismatchDeclaredParamNullable
      */
-    public function log( $level, string|\Stringable $message, array $context = [] ) : void {
+    public function log( mixed $level, string|\Stringable $message, array $context = [] ) : void {
         if ( ! $this->filter( $level, $message, $context ) ) {
             return;
         }

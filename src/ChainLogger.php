@@ -29,7 +29,11 @@ class ChainLogger implements LoggerInterface {
     }
 
 
-    public function log( $level, \Stringable|string $message, array $context = [] ) : void {
+    /**
+     * @param int|string $level
+     * @suppress PhanTypeMismatchDeclaredParamNullable
+     */
+    public function log( mixed $level, \Stringable|string $message, array $context = [] ) : void {
         foreach ( $this->loggers as $logger ) {
             $logger->log( $level, $message, $context );
         }

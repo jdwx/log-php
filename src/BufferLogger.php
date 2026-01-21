@@ -33,6 +33,10 @@ class BufferLogger implements LoggerInterface, Countable {
     }
 
 
+    /**
+     * @param int|string $level
+     * @suppress PhanTypeMismatchDeclaredParamNullable
+     */
     public function log( mixed $level, string|Stringable $message, array $context = [] ) : void {
         $this->rLogs[] = new LogEntry( $level, $message, $context );
     }

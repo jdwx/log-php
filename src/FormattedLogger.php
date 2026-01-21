@@ -103,7 +103,10 @@ abstract class FormattedLogger extends AbstractLogger {
 
 
     /**
-     * @inheritDoc
+     * @param int|string $level
+     * @param Stringable|string $message
+     * @param array<string, mixed> $context
+     * @suppress PhanTypeMismatchDeclaredParamNullable
      */
     public function log( mixed $level, Stringable|string $message, array $context = [] ) : void {
         $stLevel = $this->renderLevel( $level, $context );
