@@ -8,10 +8,11 @@ namespace JDWX\Log\Telemetry;
 
 
 use JDWX\Log\ContextSerializable;
+use JDWX\Log\LevelInterface;
 use Psr\Log\LoggerInterface;
 
 
-interface NodeInterface extends LoggerInterface, ContextSerializable {
+interface NodeInterface extends ContextSerializable, LevelInterface, LoggerInterface {
 
 
     /** @param array<string, mixed[]|bool|float|int|string|ContextSerializable|\JsonSerializable|\Stringable|null> $i_rContext */
@@ -23,6 +24,9 @@ interface NodeInterface extends LoggerInterface, ContextSerializable {
 
     /** @return array<string, mixed[]|bool|float|int|string|ContextSerializable|\JsonSerializable|\Stringable|null> */
     public function getContext() : array;
+
+
+    public function level() : string;
 
 
     /** @param mixed[]|bool|float|int|string|ContextSerializable|\JsonSerializable|\Stringable|null $i_value */

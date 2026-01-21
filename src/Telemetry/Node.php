@@ -9,9 +9,12 @@ namespace JDWX\Log\Telemetry;
 
 use JDWX\Log\ContextSerializable;
 use JDWX\Log\ContextSerializableTrait;
+use JDWX\Log\LevelInterface;
+use JDWX\Log\LogLevels;
 use JDWX\Log\TimestampedLogEntry;
 use JsonSerializable;
 use Psr\Log\LoggerTrait;
+use Psr\Log\LogLevel;
 use Stringable;
 
 
@@ -78,6 +81,17 @@ class Node implements NodeInterface {
 
     public function isFinished() : bool {
         return $this->bFinished;
+    }
+
+
+    public function level() : string {
+        $uLevel = LogLevel::DEBUG;
+        foreach ( $this->rChildren as $child ) {
+            if ( $child instanceof LevelInterface ) {
+                $uLevel = LogLevels::mostSevere( $uLevel, $child->level() );
+            }
+        }
+        return $uLevel;
     }
 
 

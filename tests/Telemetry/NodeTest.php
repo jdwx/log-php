@@ -49,6 +49,16 @@ final class NodeTest extends TestCase {
     }
 
 
+    public function testLevel() : void {
+        $node = new Node();
+        self::assertSame( LogLevel::DEBUG, $node->level() );
+
+        $node = new Node();
+        $node->info( 'Info message.' );
+        self::assertSame( LogLevel::INFO, $node->level() );
+    }
+
+
     public function testLog() : void {
         $node = new Node();
         $node->info( 'Info message.', [ 'foo' => 'bar' ] );
