@@ -36,6 +36,8 @@ class BufferLogger implements LoggerInterface, Countable {
     /**
      * @param int|string $level
      * @suppress PhanTypeMismatchDeclaredParamNullable
+     *
+     * Does not validate $level because this is mainly used for capturing actual values in testing.
      */
     public function log( mixed $level, string|Stringable $message, array $context = [] ) : void {
         $this->rLogs[] = new LogEntry( $level, $message, $context );

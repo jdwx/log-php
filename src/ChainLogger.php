@@ -32,6 +32,8 @@ class ChainLogger implements LoggerInterface {
     /**
      * @param int|string $level
      * @suppress PhanTypeMismatchDeclaredParamNullable
+     *
+     * Does not check level; relies on underlying loggers to do that.
      */
     public function log( mixed $level, \Stringable|string $message, array $context = [] ) : void {
         foreach ( $this->loggers as $logger ) {
