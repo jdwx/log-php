@@ -121,7 +121,7 @@ abstract class FormattedLogger extends AbstractLogger {
 
     /** @param mixed[] $context */
     protected function renderLevel( mixed $level, array &$context ) : string {
-        $stLevel = strtoupper( static::normalizeLevelEx( $level, 'UNKNOWN' ) );
+        $stLevel = strtoupper( LogLevels::toStringEx( $level ) );
         if ( isset( $context[ 'class' ] ) ) {
             $stLevel .= '(' . $context[ 'class' ] . ')';
             unset( $context[ 'class' ] );

@@ -18,6 +18,10 @@ use Psr\Log\LogLevel;
 final class AbstractLoggerTest extends TestCase {
 
 
+    /**
+     * @noinspection PhpDeprecationInspection
+     * @suppress PhanDeprecatedFunction
+     */
     public function testCompareLevels() : void {
         self::assertSame( 0, AbstractLogger::compareLevels( 'emergency', LOG_EMERG ) );
         self::assertSame( 1, AbstractLogger::compareLevels( 'alert', 'emergency' ) );
@@ -29,6 +33,10 @@ final class AbstractLoggerTest extends TestCase {
     }
 
 
+    /**
+     * @noinspection PhpDeprecationInspection
+     * @suppress PhanDeprecatedFunction
+     */
     public function testNormalizeLevel() : void {
         self::assertSame( LogLevel::EMERGENCY, AbstractLogger::normalizeLevel( 'emergency' ) );
         self::assertSame( LogLevel::ALERT, AbstractLogger::normalizeLevel( 'alert' ) );
@@ -43,6 +51,10 @@ final class AbstractLoggerTest extends TestCase {
     }
 
 
+    /**
+     * @noinspection PhpDeprecationInspection
+     * @suppress PhanDeprecatedFunction
+     */
     public function testNormalizeLevelEx() : void {
         self::assertSame( LogLevel::EMERGENCY, AbstractLogger::normalizeLevelEx( 'emergency' ) );
         $this->expectException( InvalidArgumentException::class );
@@ -50,6 +62,10 @@ final class AbstractLoggerTest extends TestCase {
     }
 
 
+    /**
+     * @noinspection PhpDeprecationInspection
+     * @suppress PhanDeprecatedFunction
+     */
     public function testNormalizeLevelInt() : void {
         self::assertSame( 0, AbstractLogger::normalizeLevelInt( 'emergency' ) );
         self::assertSame( 1, AbstractLogger::normalizeLevelInt( 'alert' ) );
@@ -65,6 +81,10 @@ final class AbstractLoggerTest extends TestCase {
     }
 
 
+    /**
+     * @noinspection PhpDeprecationInspection
+     * @suppress PhanDeprecatedFunction
+     */
     public function testNormalizeLevelIntEx() : void {
         self::assertSame( 0, AbstractLogger::normalizeLevelIntEx( 'emergency' ) );
         $this->expectException( InvalidArgumentException::class );

@@ -17,7 +17,7 @@ class DebugFilterLogger extends FilterLogger {
      * @inheritDoc
      */
     protected function filter( mixed $level, \Stringable|string $message, array $context ) : bool {
-        return static::normalizeLevel( $level ) !== LogLevel::DEBUG;
+        return LogLevels::toString( $level ) !== LogLevel::DEBUG;
     }
 
 

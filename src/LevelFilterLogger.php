@@ -24,7 +24,7 @@ class LevelFilterLogger extends FilterLogger {
      */
     public function __construct( LoggerInterface $logger, mixed $level, private readonly bool $bExact = false ) {
         parent::__construct( $logger );
-        $this->level = static::normalizeLevelIntEx( $level );
+        $this->level = LogLevels::toIntEx( $level );
     }
 
 
@@ -33,9 +33,9 @@ class LevelFilterLogger extends FilterLogger {
      */
     protected function filter( int|string $level, \Stringable|string $message, array $context ) : bool {
         if ( $this->bExact ) {
-            return static::normalizeLevelIntEx( $level ) === $this->level;
+            return LogLevels::toIntEx( $level ) === $this->level;
         }
-        return static::compareLevels( $level, $this->level ) <= 0;
+        return LogLevels::compare( $level, $this->level ) <= 0;
     }
 
 

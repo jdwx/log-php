@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
+use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
 
 
@@ -137,7 +138,7 @@ final class LogLevels {
         if ( is_string( $stLevel ) ) {
             return $stLevel;
         }
-        throw new \InvalidArgumentException( "Invalid log level: {$i_level}" );
+        throw new InvalidArgumentException( "Invalid log level: {$i_level}" );
     }
 
 

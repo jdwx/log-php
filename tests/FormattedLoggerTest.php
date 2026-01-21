@@ -11,6 +11,7 @@ use JDWX\Log\FormattedLogger;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
 use RuntimeException;
 use stdClass;
@@ -162,9 +163,8 @@ final class FormattedLoggerTest extends TestCase {
 
     public function testLogInvalid() : void {
         $logger = new MyFormattedLogger();
+        $this->expectException( InvalidArgumentException::class );
         $logger->log( 'INVALID', 'TEST_MESSAGE' );
-        self::assertStringContainsString( 'UNKNOWN', $logger->stWritten );
-        self::assertStringContainsString( 'TEST_MESSAGE', $logger->stWritten );
     }
 
 
