@@ -15,6 +15,12 @@ use Psr\Log\InvalidArgumentException;
 class NullLoggerTest extends TestCase {
 
 
+    public function testGetLogger() : void {
+        $null = new NullLogger();
+        self::assertNull( $null->getLogger() );
+    }
+
+
     public function testLog() : void {
         $null = new NullLogger();
         # It doesn't do anything, so about all we can test is whether it explodes if

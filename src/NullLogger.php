@@ -8,6 +8,7 @@ namespace JDWX\Log;
 
 
 use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
 
 
 /**
@@ -16,6 +17,11 @@ use Psr\Log\AbstractLogger;
  * A logger that throws away everything logged.
  */
 class NullLogger extends AbstractLogger {
+
+
+    public function getLogger() : ?LoggerInterface {
+        return null;
+    }
 
 
     /**

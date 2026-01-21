@@ -33,6 +33,20 @@ final class AbstractLoggerTest extends TestCase {
     }
 
 
+    public function testGetLogger() : void {
+        $log = new class extends AbstractLogger {
+
+
+            public function log( $level, \Stringable|string $message, array $context = [] ) : void {
+                // TODO: Implement log() method.
+            }
+
+
+        };
+        self::assertSame( $log, $log->getLogger() );
+    }
+
+
     /**
      * @noinspection PhpDeprecationInspection
      * @suppress PhanDeprecatedFunction

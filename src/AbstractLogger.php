@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 
 
-abstract class AbstractLogger implements LoggerInterface {
+abstract class AbstractLogger implements HasLoggerInterface, LoggerInterface {
 
 
     use LoggerTrait;
@@ -76,6 +76,11 @@ abstract class AbstractLogger implements LoggerInterface {
             return $level;
         }
         throw new InvalidArgumentException( 'Invalid log level' );
+    }
+
+
+    public function getLogger() : ?LoggerInterface {
+        return $this;
     }
 
 
