@@ -30,6 +30,33 @@ final class LogLevels {
     }
 
 
+    public static function isValid( int|string $i_level ) : bool {
+        if ( is_int( $i_level ) ) {
+            return in_array( $i_level, [
+                LOG_EMERG,
+                LOG_ALERT,
+                LOG_CRIT,
+                LOG_ERR,
+                LOG_WARNING,
+                LOG_NOTICE,
+                LOG_INFO,
+                LOG_DEBUG,
+            ], true );
+        }
+        $i_level = strtolower( trim( $i_level ) );
+        return in_array( $i_level, [
+            LogLevel::EMERGENCY,
+            LogLevel::ALERT,
+            LogLevel::CRITICAL,
+            LogLevel::ERROR,
+            LogLevel::WARNING,
+            LogLevel::NOTICE,
+            LogLevel::INFO,
+            LogLevel::DEBUG,
+        ], true );
+    }
+
+
     public static function leastSevere( int|string ...$levels ) : int|string {
         if ( empty( $levels ) ) {
             throw new \InvalidArgumentException( 'At least one log level must be provided' );
