@@ -35,10 +35,18 @@ final class FormattedLoggerTest extends TestCase {
 
 
     public function testFormatArray() : void {
-        $result = FormattedLogger::formatArray( [ 'message' => 'TEST_MESSAGE', 'foo' => 'bar' ] );
-        self::assertStringContainsString( 'TEST_MESSAGE', $result );
-        self::assertStringContainsString( 'foo', $result );
-        self::assertStringContainsString( 'bar', $result );
+        $result = FormattedLogger::formatArray( [
+            'message' => 'TEST_MESSAGE',
+            'foo' => 'bar',
+            'baz' => true,
+            'qux' => false,
+            'quux' => null,
+        ] );
+        self::assertStringContainsString( 'message: TEST_MESSAGE', $result );
+        self::assertStringContainsString( 'foo: bar', $result );
+        self::assertStringContainsString( 'baz: true', $result );
+        self::assertStringContainsString( 'qux: false', $result );
+        self::assertStringContainsString( 'quux: null', $result );
     }
 
 

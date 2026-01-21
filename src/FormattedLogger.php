@@ -86,6 +86,12 @@ abstract class FormattedLogger extends AbstractLogger {
                     $i_rAlreadySeen[] = $xValue;
                     $st .= get_class( $xValue ) . ' ' . self::formatArrayInner( (array) $xValue, $i_uIndent + 2, $i_rAlreadySeen );
                 }
+            } elseif ( is_bool( $xValue ) ) {
+                $st .= $xValue ? 'true' : 'false';
+                $st .= "\n";
+            } elseif ( is_null( $xValue ) ) {
+                $st .= 'null';
+                $st .= "\n";
             } else {
                 $st .= $xValue;
                 $st .= "\n";
