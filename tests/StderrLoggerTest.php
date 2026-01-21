@@ -10,6 +10,7 @@ namespace JDWX\Log\Tests;
 use JDWX\Log\StderrLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\InvalidArgumentException;
 use function JDWX\Log\FetchErrorLine;
 
 
@@ -28,6 +29,9 @@ final class StderrLoggerTest extends TestCase {
         self::assertSame( '  x: 123', FetchErrorLine( 1 ) );
         self::assertSame( '}', FetchErrorLine( 2 ) );
         self::assertNull( FetchErrorLine( 3 ) );
+
+        $this->expectException( InvalidArgumentException::class );
+        $logger->log( 'invalid', 'Nope.' );
     }
 
 
