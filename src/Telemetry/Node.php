@@ -85,13 +85,13 @@ class Node implements NodeInterface {
 
 
     public function level() : string {
-        $uLevel = LogLevel::DEBUG;
+        $level = LogLevel::DEBUG;
         foreach ( $this->rChildren as $child ) {
             if ( $child instanceof LevelInterface ) {
-                $uLevel = LogLevels::mostSevere( $uLevel, $child->level() );
+                $level = LogLevels::mostSevere( $level, $child->level() );
             }
         }
-        return $uLevel;
+        return LogLevels::toStringEx( $level );
     }
 
 
