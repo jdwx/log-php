@@ -24,7 +24,7 @@ final class StderrLoggerTest extends TestCase {
         $logger = new StderrLogger();
         $logger->info( 'Test {x}', [ 'x' => 123 ] );
 
-        self::assertSame( 'INFO: Test {x} {', FetchErrorLine( 0 ) );
+        self::assertSame( 'INFO: Test 123 {', FetchErrorLine( 0 ) );
         self::assertSame( '  x: 123', FetchErrorLine( 1 ) );
         self::assertSame( '}', FetchErrorLine( 2 ) );
         self::assertNull( FetchErrorLine( 3 ) );

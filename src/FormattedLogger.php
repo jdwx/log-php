@@ -41,6 +41,29 @@ abstract class FormattedLogger extends AbstractLogger {
     }
 
 
+    /** @param array<string, mixed> $context
+     * @noinspection PhpCastIsUnnecessaryInspection
+     */
+    public static function interpolate( string|Stringable $message, array $context ) : string {
+        $replace = [];
+        foreach ( $context as $key => $val ) {
+            # check that the key doesn't contain any invalid characters
+            $key = strval( $key ); # stupid integer key quirk
+            if ( ! preg_match( '/^[a-zA-Z0-9_.]+$/', $key ) ) {
+                continue;
+            }
+
+            # check that the value can be cast to string
+            if ( ! is_array( $val ) && ( ! is_object( $val ) || method_exists( $val, '__toString' ) ) ) {
+                $replace[ '{' . $key . '}' ] = $val;
+            }
+        }
+
+        # interpolate replacement values into the message and return
+        return strtr( strval( $message ), $replace );
+    }
+
+
     /**
      * @param array<string, mixed> $i_r
      * @param int $i_uIndent The number of spaces to indent nested arrays. (Internal.)
@@ -82,7 +105,7 @@ abstract class FormattedLogger extends AbstractLogger {
      */
     public function log( mixed $level, Stringable|string $message, array $context = [] ) : void {
         $stLevel = $this->renderLevel( $level, $context );
-        $stMessage = $this->renderMessage( $message );
+        $stMessage = $this->renderMessage( $message, $context );
         $stContext = $this->renderContext( $context );
         $this->write( trim( "{$stLevel}: {$stMessage} {$stContext}" ) );
     }
@@ -111,8 +134,9 @@ abstract class FormattedLogger extends AbstractLogger {
     }
 
 
-    protected function renderMessage( string|Stringable $stMessage ) : string {
-        return $stMessage instanceof Stringable ? $stMessage->__toString() : $stMessage;
+    /** @param mixed[] $context */
+    protected function renderMessage( string|Stringable $message, array $context ) : string {
+        return self::interpolate( $message, $context );
     }
 
 

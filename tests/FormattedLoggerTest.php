@@ -117,6 +117,14 @@ final class FormattedLoggerTest extends TestCase {
     }
 
 
+    public function testInterpolate() : void {
+        self::assertSame( 'Test {y}', FormattedLogger::interpolate( 'Test {y}', [ 'x' => 123 ] ) );
+        self::assertSame( 'Test', FormattedLogger::interpolate( 'Test', [] ) );
+        self::assertSame( 'Test 123', FormattedLogger::interpolate( 'Test {x}', [ 'x' => 123 ] ) );
+        self::assertSame( 'Test {foo*bar}', FormattedLogger::interpolate( 'Test {foo*bar}', [ 'foo*bar' => 'baz' ] ) );
+    }
+
+
     public function testLog() : void {
         $logger = new MyFormattedLogger();
         $logger->log( LogLevel::WARNING, 'TEST_MESSAGE', [
