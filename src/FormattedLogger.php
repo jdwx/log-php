@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
+use JsonSerializable;
 use Stringable;
 use Throwable;
 
@@ -62,8 +63,50 @@ abstract class FormattedLogger extends AbstractLogger {
 
 
     /**
+     * @param mixed $xValue The input value.
+     * @return mixed The loggable value.
+     *
+     * Prepare an arbitrary value to be represented in a log context without
+     * converting them to strings.
+     */
+    public static function value( mixed $xValue ) : mixed {
+        if ( is_int( $xValue ) || is_float( $xValue ) || is_bool( $xValue ) || is_null( $xValue )
+            || is_string( $xValue ) ) {
+            return $xValue;
+        }
+        if ( is_array( $xValue ) ) {
+            return array_map( fn( $x ) => self::value( $x ), $xValue );
+        }
+        if ( is_resource( $xValue ) ) {
+            return '(resource)';
+        }
+
+        if ( ! is_object( $xValue ) ) {
+            // @codeCoverageIgnoreStart
+            $stType = gettype( $xValue );
+            $stValue = strval( $xValue );
+            return "{$stType}({$stValue})";
+            // @codeCoverageIgnoreEnd
+        }
+        if ( $xValue instanceof ContextSerializable ) {
+            return self::value( $xValue->contextSerialize() );
+        }
+        if ( $xValue instanceof JsonSerializable ) {
+            return self::value( $xValue->jsonSerialize() );
+        }
+        if ( $xValue instanceof Throwable ) {
+            return self::value( self::exceptionToArray( $xValue ) );
+        }
+        if ( $xValue instanceof Stringable ) {
+            return strval( $xValue );
+        }
+        return $xValue::class;
+    }
+
+
+    /**
      * @param array<string, mixed> $i_r
-     * @param int $i_uIndent The number of spaces to indent nested arrays. (Internal.)
+     * @param int                  $i_uIndent      The number of spaces to indent nested arrays. (Internal.)
      * @param list<mixed[]|object> $i_rAlreadySeen Objects that have already been printed. (Internal.)
      * @return string The formatted string representation of the array.
      */
@@ -104,8 +147,8 @@ abstract class FormattedLogger extends AbstractLogger {
 
 
     /**
-     * @param int|string $level
-     * @param Stringable|string $message
+     * @param int|string           $level
+     * @param Stringable|string    $message
      * @param array<string, mixed> $context
      * @suppress PhanTypeMismatchDeclaredParamNullable
      */

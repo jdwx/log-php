@@ -8,7 +8,9 @@ namespace JDWX\Log\Tests;
 
 
 use Exception;
+use JDWX\Log\ContextSerializable;
 use JDWX\Log\FormattedLogger;
+use JsonSerializable;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +18,7 @@ use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
 use RuntimeException;
 use stdClass;
+use Stringable;
 
 
 require_once __DIR__ . '/MyFormattedLogger.php';
@@ -188,6 +191,92 @@ final class FormattedLoggerTest extends TestCase {
         $logger = new MyFormattedLogger();
         $result = $logger->renderContext( [ 'exception' => new Exception( 'Test exception' ) ] );
         self::assertStringContainsString( 'class: Exception', $result );
+    }
+
+
+    public function testValueForArray() : void {
+        $r = [ 0 => 'foo', 1 => 'bar', 2 => true, 'baz' => 'qux' ];
+        self::assertSame( $r, FormattedLogger::value( $r ) );
+    }
+
+
+    public function testValueForBuiltin() : void {
+        self::assertSame( 'test', FormattedLogger::value( 'test' ) );
+        self::assertSame( true, FormattedLogger::value( true ) );
+        self::assertSame( null, FormattedLogger::value( null ) );
+        self::assertSame( 12345, FormattedLogger::value( 12345 ) );
+        self::assertSame( 12345.6, FormattedLogger::value( 12345.6 ) );
+    }
+
+
+    public function testValueForContextSerializable() : void {
+        $ctx = new class implements ContextSerializable {
+
+
+            public function contextSerialize() : string {
+                return 'test';
+            }
+
+
+        };
+        self::assertSame( 'test', FormattedLogger::value( $ctx ) );
+    }
+
+
+    public function testValueForException() : void {
+        $ex = new Exception( 'Test exception', 12345 );
+        $rCheck = [
+            'class' => 'Exception',
+            'message' => 'Test exception',
+            'code' => 12345,
+            'file' => __FILE__,
+            'line' => -1,
+            'trace' => '#trace',
+        ];
+        $rValue = FormattedLogger::value( $ex );
+        $rValue[ 'line' ] = -1;
+        $rValue[ 'trace' ] = '#trace';
+        self::assertSame( $rCheck, $rValue );
+    }
+
+
+    public function testValueForJsonSerializable() : void {
+        $jso = new class implements JsonSerializable {
+
+
+            public function jsonSerialize() : string {
+                return 'test';
+            }
+
+
+        };
+        self::assertSame( 'test', FormattedLogger::value( $jso ) );
+    }
+
+
+    public function testValueForObject() : void {
+        self::assertSame( $this::class, FormattedLogger::value( $this ) );
+    }
+
+
+    public function testValueForResource() : void {
+        $f = fopen( 'php://memory', 'r' );
+        self::assertSame( '(resource)', FormattedLogger::value( $f ) );
+    }
+
+
+    public function testValueForStringable() : void {
+        $str = new class implements Stringable {
+
+
+            public function __toString() : string {
+                return 'test';
+            }
+
+
+        };
+
+        self::assertSame( 'test', FormattedLogger::value( $str ) );
     }
 
 
