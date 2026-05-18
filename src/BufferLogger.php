@@ -10,6 +10,7 @@ namespace JDWX\Log;
 use Countable;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
+use RuntimeException;
 use Stringable;
 
 
@@ -54,7 +55,7 @@ class BufferLogger implements LoggerInterface, Countable {
         if ( $log instanceof LogEntry ) {
             return $log;
         }
-        throw new \RuntimeException( 'No log entry available' );
+        throw new RuntimeException( 'No log entry available' );
     }
 
 
