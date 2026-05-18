@@ -86,6 +86,14 @@ class LogEntryTest extends TestCase {
     }
 
 
+    public function testInterpolatedMessage() : void {
+        $logEntry = new LogEntry( LOG_INFO, 'foo-{bar}-baz', [
+            'bar' => 'qux',
+        ] );
+        self::assertSame( 'foo-qux-baz', $logEntry->interpolatedMessage() );
+    }
+
+
     public function testLevel() : void {
         $logEntry = new LogEntry( LOG_INFO, 'test', [] );
         self::assertSame( LogLevel::INFO, $logEntry->level() );

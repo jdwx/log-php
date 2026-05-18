@@ -30,13 +30,18 @@ readonly class LogEntry implements Stringable, LogEntryInterface {
 
 
     public function __toString() : string {
-        return "[{$this->level}] {$this->message}";
+        return "[{$this->level}] " . $this->interpolatedMessage();
     }
 
 
     /** @return mixed[] */
     public function context() : array {
         return $this->context;
+    }
+
+
+    public function interpolatedMessage() : string {
+        return FormattedLogger::interpolate( $this->message, $this->context );
     }
 
 
