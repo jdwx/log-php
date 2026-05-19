@@ -10,7 +10,7 @@ namespace JDWX\Log;
 use Stringable;
 
 
-abstract class AbstractContextDecorator extends ProxyLogger {
+abstract class AbstractContextDecoratorLogger extends ProxyLogger {
 
 
     public function log( $level, Stringable|string $message, array $context = [] ) : void {

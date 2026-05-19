@@ -7,11 +7,13 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
-class ContextDecorator extends AbstractContextDecorator {
+class ContextDecoratorLogger extends AbstractContextDecoratorLogger {
 
 
-    /** @var array<int|string, mixed> */
-    private array $rExtraContext = [];
+    /** @param array<int|string, mixed> $rExtraContext */
+    public function __construct( \Psr\Log\LoggerInterface $i_logger, private array $rExtraContext = [] ) {
+        parent::__construct( $i_logger );
+    }
 
 
     public function setContext( int|string $i_key, mixed $i_value ) : void {
