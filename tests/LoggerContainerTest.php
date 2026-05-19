@@ -29,6 +29,16 @@ class LoggerContainerTest extends TestCase {
     }
 
 
+    public function testHasLogger() : void {
+        $container = new LoggerContainer();
+        self::assertFalse( $container->hasLogger() );
+
+        $log = new BufferLogger();
+        $container->setLogger( $log );
+        self::assertTrue( $container->hasLogger() );
+    }
+
+
     public function testLog() : void {
         $buffer = new BufferLogger();
         $container = new LoggerContainer();

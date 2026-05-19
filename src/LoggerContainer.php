@@ -40,6 +40,11 @@ class LoggerContainer implements LoggerInterface {
     }
 
 
+    public function hasLogger() : bool {
+        return $this->logger instanceof LoggerInterface;
+    }
+
+
     public function log( $level, Stringable|string $message, array $context = [] ) : void {
         $this->logger?->log( $level, $message, $context );
     }
