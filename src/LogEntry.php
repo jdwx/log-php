@@ -7,10 +7,11 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
+use JsonSerializable;
 use Stringable;
 
 
-readonly class LogEntry implements Stringable, LogEntryInterface {
+readonly class LogEntry implements Stringable, LogEntryInterface, JsonSerializable {
 
 
     public string $level;
@@ -42,6 +43,16 @@ readonly class LogEntry implements Stringable, LogEntryInterface {
 
     public function interpolatedMessage() : string {
         return FormattedLogger::interpolate( $this->message, $this->context );
+    }
+
+
+    /** @return array<string, mixed> */
+    public function jsonSerialize() : array {
+        return [
+            'level' => $this->level,
+            'message' => $this->interpolatedMessage(),
+            'context' => FormattedLogger::value( $this->context ),
+        ];
     }
 
 

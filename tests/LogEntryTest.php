@@ -94,6 +94,15 @@ class LogEntryTest extends TestCase {
     }
 
 
+    public function testJsonSerialize() : void {
+        $logEntry = new LogEntry( LOG_INFO, 'foo-{bar}-baz', [ 'bar' => 'qux' ] );
+        $jso = $logEntry->jsonSerialize();
+        self::assertSame( LogLevel::INFO, $jso[ 'level' ] );
+        self::assertSame( 'foo-qux-baz', $jso[ 'message' ] );
+        self::assertSame( [ 'bar' => 'qux' ], $jso[ 'context' ] );
+    }
+
+
     public function testLevel() : void {
         $logEntry = new LogEntry( LOG_INFO, 'test', [] );
         self::assertSame( LogLevel::INFO, $logEntry->level() );
@@ -112,6 +121,15 @@ class LogEntryTest extends TestCase {
     public function testToString() : void {
         $logEntry = new LogEntry( LOG_INFO, 'test message', [] );
         self::assertSame( '[info] test message', strval( $logEntry ) );
+    }
+
+
+    public function testWithContext() : void {
+        $logEntry = new LogEntry( LOG_INFO, 'test message', [] );
+        $logEntry = $logEntry->withContext( [ 'foo' => 'bar' ] );
+        self::assertSame( LogLevel::INFO, $logEntry->level() );
+        self::assertSame( 'test message', $logEntry->message() );
+        self::assertSame( [ 'foo' => 'bar' ], $logEntry->context() );
     }
 
 
