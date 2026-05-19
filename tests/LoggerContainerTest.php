@@ -10,13 +10,15 @@ namespace JDWX\Log\Tests;
 use JDWX\Log\BufferLogger;
 use JDWX\Log\LoggerContainer;
 use JDWX\Log\LoggerDecorator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 use Stringable;
 
 
-class LoggerContainerTest extends TestCase {
+#[CoversClass( LoggerContainer::class )]
+final class LoggerContainerTest extends TestCase {
 
 
     public function testGetLogger() : void {

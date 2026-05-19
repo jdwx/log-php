@@ -46,7 +46,7 @@ class LoggerContainer implements LoggerInterface {
 
 
     public function log( $level, Stringable|string $message, array $context = [] ) : void {
-        $this->logger?->log( $level, $message, $context );
+        $this->getLogger()?->log( $level, $message, $context );
     }
 
 
