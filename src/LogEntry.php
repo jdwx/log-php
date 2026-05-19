@@ -55,4 +55,10 @@ readonly class LogEntry implements Stringable, LogEntryInterface {
     }
 
 
+    /** @param array<int|string, mixed> $i_rContext */
+    public function withContext( array $i_rContext ) : self {
+        return new self( $this->level, $this->message, $i_rContext );
+    }
+
+
 }

@@ -15,13 +15,17 @@ class BufferBatchLogger extends AbstractBatchLogger {
 
     public string $stLastLevel;
 
+    /** @var array<int|string, mixed> */
+    public array $rCommonContext = [];
+
 
     /**
      * @inheritDoc
      */
-    protected function batch( string $i_stLevel, array $i_rLogMessages ) : void {
+    protected function batch( string $i_stLevel, array $i_rLogMessages, array $i_rCommonContext ) : void {
         $this->rLastBatch = $i_rLogMessages;
         $this->stLastLevel = $i_stLevel;
+        $this->rCommonContext = $i_rCommonContext;
     }
 
 
