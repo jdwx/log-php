@@ -10,10 +10,11 @@ namespace JDWX\Log\Telemetry;
 use JDWX\Log\ContextSerializable;
 use JDWX\Log\ContextSerializableTrait;
 use JDWX\Log\LevelInterface;
+use JDWX\Log\LoggerTrait;
 use JDWX\Log\LogLevels;
 use JDWX\Log\TimestampedLogEntry;
 use JsonSerializable;
-use Psr\Log\LoggerTrait;
+use LogicException;
 use Psr\Log\LogLevel;
 use Stringable;
 
@@ -103,7 +104,7 @@ class Node implements NodeInterface {
     /** @param mixed[]|bool|float|int|string|ContextSerializable|JsonSerializable|Stringable|null $i_value */
     public function push( array|bool|float|int|string|ContextSerializable|JsonSerializable|Stringable|null $i_value ) : void {
         if ( $this->bFinished ) {
-            throw new \LogicException( 'Telemetry node child pushed after finish.' );
+            throw new LogicException( 'Telemetry node child pushed after finish.' );
         }
         $this->rChildren[] = $i_value;
     }
@@ -113,7 +114,7 @@ class Node implements NodeInterface {
     public function setContext( string                                                                           $i_stKey,
                                 array|bool|float|int|string|ContextSerializable|JsonSerializable|Stringable|null $i_value ) : void {
         if ( $this->bFinished ) {
-            throw new \LogicException( 'Telemetry node context set after finish.' );
+            throw new LogicException( 'Telemetry node context set after finish.' );
         }
         # Serialize here to ensure that later changes to $i_value (like deleting an underlying database
         # row) do not invalidate our context.

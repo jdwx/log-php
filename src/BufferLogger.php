@@ -8,15 +8,11 @@ namespace JDWX\Log;
 
 
 use Countable;
-use Psr\Log\LoggerTrait;
 use RuntimeException;
 use Stringable;
 
 
 class BufferLogger extends AbstractLogger implements Countable {
-
-
-    use LoggerTrait;
 
 
     /** @var LogEntry[] */
