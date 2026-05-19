@@ -30,7 +30,7 @@ class ContextDecoratorLogger extends AbstractContextDecoratorLogger {
      * @param array<int|string, mixed> $i_rContext
      * @return array<int|string, mixed>
      */
-    protected function decorateContext( array $i_rContext ) : array {
+    protected function decorateContext( int|string $i_level, array $i_rContext ) : array {
         return array_merge( $this->rExtraContext, $i_rContext );
     }
 

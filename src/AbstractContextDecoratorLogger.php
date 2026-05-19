@@ -14,7 +14,7 @@ abstract class AbstractContextDecoratorLogger extends ProxyLogger {
 
 
     public function log( $level, Stringable|string $message, array $context = [] ) : void {
-        parent::log( $level, $message, $this->decorateContext( $context ) );
+        parent::log( $level, $message, $this->decorateContext( $level, $context ) );
     }
 
 
@@ -22,7 +22,7 @@ abstract class AbstractContextDecoratorLogger extends ProxyLogger {
      * @param array<string, mixed> $i_rContext
      * @return array<string, mixed>
      */
-    abstract protected function decorateContext( array $i_rContext ) : array;
+    abstract protected function decorateContext( int|string $i_level, array $i_rContext ) : array;
 
 
 }
