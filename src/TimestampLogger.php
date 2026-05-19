@@ -15,7 +15,7 @@ use DateTimeZone;
  * Adds a timestamp to each log message. This is most useful in conjunction with
  * StderrLogger, which just dumps the log to stderr without decoration.
  */
-class TimestampLogger extends AbstractDirectLogger {
+class TimestampLogger extends ProxyLogger {
 
 
     private readonly ?DateTimeZone $timezone;
@@ -28,10 +28,11 @@ class TimestampLogger extends AbstractDirectLogger {
      *                                           Defaults to UTC. Pass null to use the local timezone.
      */
     public function __construct(
-        private readonly LoggerInterface $parent,
-        private readonly string          $format = '[Y-m-d H:i:s] ',
-        DateTimeZone|string|null         $timezone = 'UTC',
+        LoggerInterface          $parent,
+        private readonly string  $format = '[Y-m-d H:i:s] ',
+        DateTimeZone|string|null $timezone = 'UTC',
     ) {
+        parent::__construct( $parent );
         if ( is_string( $timezone ) ) {
             $this->timezone = new DateTimeZone( $timezone );
         } else {
@@ -49,7 +50,7 @@ class TimestampLogger extends AbstractDirectLogger {
     public function log( $level, \Stringable|string $message, array $context = [] ) : void {
         $dt = new DateTime( 'now', $this->timezone );
         $message = $dt->format( $this->format ) . $message;
-        $this->parent->log( $level, $message, $context );
+        parent::log( $level, $message, $context );
     }
 
 

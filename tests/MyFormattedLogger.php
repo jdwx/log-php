@@ -7,10 +7,10 @@ declare( strict_types = 1 );
 namespace JDWX\Log\Tests;
 
 
-use JDWX\Log\FormattedLogger;
+use JDWX\Log\AbstractFormattedLogger;
 
 
-class MyFormattedLogger extends FormattedLogger {
+class MyFormattedLogger extends AbstractFormattedLogger {
 
 
     public string $stWritten = '';

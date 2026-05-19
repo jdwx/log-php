@@ -10,10 +10,7 @@ namespace JDWX\Log;
 use Stringable;
 
 
-abstract class FilterLogger extends AbstractDirectLogger {
-
-
-    public function __construct( private readonly \Psr\Log\LoggerInterface $logger ) {}
+abstract class FilterLogger extends ProxyLogger {
 
 
     /**
@@ -27,7 +24,7 @@ abstract class FilterLogger extends AbstractDirectLogger {
         if ( ! $this->filter( $level, $message, $context ) ) {
             return;
         }
-        $this->logger->log( $level, $message, $context );
+        parent::log( $level, $message, $context );
     }
 
 

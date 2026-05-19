@@ -7,7 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
-class StderrLogger extends FormattedLogger {
+class StderrLogger extends AbstractFormattedLogger {
 
 
     protected function write( string $stMessage ) : void {

@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
+use Psr\Log\AbstractLogger;
 use Stringable;
 
 
@@ -15,7 +16,10 @@ use Stringable;
  *
  * A logger that throws away everything logged.
  */
-class NullLogger extends AbstractDirectLogger {
+class NullLogger extends AbstractLogger {
+
+
+    use LoggerExtraTrait;
 
 
     public function getLogger() : ?LoggerInterface {
@@ -23,10 +27,15 @@ class NullLogger extends AbstractDirectLogger {
     }
 
 
+    public function hasLogger() : bool {
+        return false;
+    }
+
+
     /**
-     * @param int|string           $level
-     * @param Stringable|string    $message
-     * @param array<string, mixed> $context
+     * @param int|string               $level
+     * @param Stringable|string        $message
+     * @param array<int|string, mixed> $context
      * @suppress PhanTypeMismatchDeclaredParamNullable
      */
     public function log( mixed $level, Stringable|string $message, array $context = [] ) : void {

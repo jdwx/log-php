@@ -21,6 +21,12 @@ class NullLoggerTest extends TestCase {
     }
 
 
+    public function testHasLogger() : void {
+        $null = new NullLogger();
+        self::assertFalse( $null->hasLogger() );
+    }
+
+
     public function testLog() : void {
         $null = new NullLogger();
         # It doesn't do anything, so about all we can test is whether it explodes if

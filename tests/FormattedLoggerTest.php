@@ -8,7 +8,7 @@ namespace JDWX\Log\Tests;
 
 
 use Exception;
-use JDWX\Log\FormattedLogger;
+use JDWX\Log\AbstractFormattedLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\InvalidArgumentException;
@@ -18,7 +18,7 @@ use Psr\Log\LogLevel;
 require_once __DIR__ . '/MyFormattedLogger.php';
 
 
-#[CoversClass( FormattedLogger::class )]
+#[CoversClass( AbstractFormattedLogger::class )]
 final class FormattedLoggerTest extends TestCase {
 
 

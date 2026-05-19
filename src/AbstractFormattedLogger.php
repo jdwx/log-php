@@ -11,7 +11,13 @@ use Stringable;
 use Throwable;
 
 
-abstract class FormattedLogger extends AbstractDirectLogger {
+/**
+ * This class can be used as a base for loggers that don't support
+ * structured data, like StderrLogger. It focuses on generating a
+ * reasonable string representation of the log message that can
+ * be logged to a byte stream.
+ */
+abstract class AbstractFormattedLogger extends AbstractDirectLogger {
 
 
     /**
