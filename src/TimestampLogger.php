@@ -9,8 +9,6 @@ namespace JDWX\Log;
 
 use DateTime;
 use DateTimeZone;
-use Psr\Log\AbstractLogger;
-use Psr\Log\LoggerInterface;
 
 
 /**
@@ -24,10 +22,10 @@ class TimestampLogger extends AbstractLogger {
 
 
     /**
-     * @param LoggerInterface $parent The logger to wrap.
-     * @param string $format The date format string (see DateTime::format()).
+     * @param LoggerInterface          $parent   The logger to wrap.
+     * @param string                   $format   The date format string (see DateTime::format()).
      * @param DateTimeZone|string|null $timezone The timezone for timestamps.
-     *        Defaults to UTC. Pass null to use the local timezone.
+     *                                           Defaults to UTC. Pass null to use the local timezone.
      */
     public function __construct(
         private readonly LoggerInterface $parent,
@@ -43,8 +41,8 @@ class TimestampLogger extends AbstractLogger {
 
 
     /**
-     * @param int|string $level
-     * @param \Stringable|string $message
+     * @param int|string           $level
+     * @param \Stringable|string   $message
      * @param array<string, mixed> $context
      * @suppress PhanTypeMismatchDeclaredParamNullable
      */

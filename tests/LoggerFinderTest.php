@@ -10,12 +10,13 @@ namespace JDWX\Log\Tests;
 use JDWX\Log\BufferLogger;
 use JDWX\Log\HasLoggerInterface;
 use JDWX\Log\LoggerFinder;
+use JDWX\Log\LoggerInterface;
 use JDWX\Log\LoggerRegistry;
+use JDWX\Log\LoggerTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
 use RuntimeException;
+use Stringable;
 
 
 #[CoversClass( LoggerFinder::class )]
@@ -89,7 +90,8 @@ final class LoggerFinderTest extends TestCase {
             }
 
 
-            public function log( $level, \Stringable|string $message, array $context = [] ) : void {}
+            public function log( $level, Stringable|string $message, array $context = [] ) : void {
+            }
 
 
         };
@@ -111,7 +113,8 @@ final class LoggerFinderTest extends TestCase {
             }
 
 
-            public function log( $level, \Stringable|string $message, array $context = [] ) : void {}
+            public function log( $level, Stringable|string $message, array $context = [] ) : void {
+            }
 
 
         };

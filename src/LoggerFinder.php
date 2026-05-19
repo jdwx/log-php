@@ -7,7 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
-use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 
 /**
@@ -31,7 +31,8 @@ class LoggerFinder implements HasLoggerInterface {
 
 
     public function __construct( private ?LoggerInterface $logger = null,
-                                 private readonly string  $stRegistryId = LoggerRegistry::DEFAULT_LOGGER_ID ) {}
+                                 private readonly string  $stRegistryId = LoggerRegistry::DEFAULT_LOGGER_ID ) {
+    }
 
 
     /**
@@ -44,8 +45,8 @@ class LoggerFinder implements HasLoggerInterface {
 
 
     /**
-     * @param string $i_stClass The class that insists on having a logger available.
-     * @param mixed ...$rOptions All options to try to find a logger, in order of preference.
+     * @param string $i_stClass   The class that insists on having a logger available.
+     * @param mixed  ...$rOptions All options to try to find a logger, in order of preference.
      * @return LoggerInterface
      */
     public static function findEx( string $i_stClass, mixed ...$rOptions ) : LoggerInterface {
@@ -68,7 +69,7 @@ class LoggerFinder implements HasLoggerInterface {
         if ( $logger instanceof LoggerInterface ) {
             return $logger;
         }
-        throw new \RuntimeException( "A logger is required by {$i_stClass}, but none could be found." );
+        throw new RuntimeException( "A logger is required by {$i_stClass}, but none could be found." );
     }
 
 

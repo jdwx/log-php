@@ -7,7 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
-use Psr\Log\LoggerInterface;
+use Stringable;
 
 
 class LevelFilterLogger extends FilterLogger {
@@ -18,9 +18,9 @@ class LevelFilterLogger extends FilterLogger {
 
     /**
      * @param LoggerInterface $logger The wrapped logger
-     * @param mixed $level The target level
-     * @param bool $bExact True to match the level exactly, false to match levels equal to or more
-     *                       severe than the specified level.
+     * @param mixed           $level  The target level
+     * @param bool            $bExact True to match the level exactly, false to match levels equal to or more
+     *                                severe than the specified level.
      */
     public function __construct( LoggerInterface $logger, mixed $level, private readonly bool $bExact = false ) {
         parent::__construct( $logger );
@@ -31,7 +31,7 @@ class LevelFilterLogger extends FilterLogger {
     /**
      * @inheritDoc
      */
-    protected function filter( int|string $level, \Stringable|string $message, array $context ) : bool {
+    protected function filter( int|string $level, Stringable|string $message, array $context ) : bool {
         if ( $this->bExact ) {
             return LogLevels::toIntEx( $level ) === $this->level;
         }

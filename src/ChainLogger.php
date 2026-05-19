@@ -7,8 +7,6 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
 use Stringable;
 
 

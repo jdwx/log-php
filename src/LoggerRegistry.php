@@ -7,9 +7,6 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
-use Psr\Log\LoggerInterface;
-
-
 /**
  * A simple way to register loggers for global discovery when a proper
  * service discovery implementation is not available.
