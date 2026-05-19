@@ -8,13 +8,12 @@ namespace JDWX\Log;
 
 
 use Countable;
-use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use RuntimeException;
 use Stringable;
 
 
-class BufferLogger implements LoggerInterface, Countable {
+class BufferLogger extends AbstractLogger implements Countable {
 
 
     use LoggerTrait;

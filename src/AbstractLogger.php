@@ -8,8 +8,6 @@ namespace JDWX\Log;
 
 
 use Psr\Log\InvalidArgumentException;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
 
 
 abstract class AbstractLogger implements HasLoggerInterface, LoggerInterface {
@@ -20,6 +18,7 @@ abstract class AbstractLogger implements HasLoggerInterface, LoggerInterface {
 
     /**
      * The levels go UP as severity goes DOWN! I.e., DEBUG > WARNING > EMERGENCY
+     *
      * @deprecated Use LogLevels::compare(). Remove in 2.0.
      */
     public static function compareLevels( mixed $level1, mixed $level2 ) : int {

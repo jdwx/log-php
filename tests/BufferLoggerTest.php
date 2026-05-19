@@ -7,15 +7,20 @@ declare( strict_types = 1 );
 namespace JDWX\Log\Tests;
 
 
+use Exception;
+use JDWX\Log\AbstractLogger;
 use JDWX\Log\BufferLogger;
 use JDWX\Log\LogEntry;
+use JDWX\Log\LoggerExtraTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use RuntimeException;
 
 
+#[CoversClass( AbstractLogger::class )]
 #[CoversClass( BufferLogger::class )]
+#[CoversClass( LoggerExtraTrait::class )]
 final class BufferLoggerTest extends TestCase {
 
 
@@ -28,6 +33,28 @@ final class BufferLoggerTest extends TestCase {
         self::assertSame( LogLevel::ALERT, $log->level );
         self::assertSame( 'Test', $log->message );
         self::assertSame( $rContext, $log->context );
+    }
+
+
+    public function testAlertFromEx() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->alertFromEx( $ex );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::ALERT, $logEntry->level );
+        self::assertSame( 'foo', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
+    public function testAlertFromExWithMessage() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->alertFromEx( $ex, 'bar' );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::ALERT, $logEntry->level );
+        self::assertSame( 'bar', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
     }
 
 
@@ -53,6 +80,28 @@ final class BufferLoggerTest extends TestCase {
     }
 
 
+    public function testCriticalFromEx() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->criticalFromEx( $ex );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::CRITICAL, $logEntry->level );
+        self::assertSame( 'foo', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
+    public function testCriticalFromExWithMessage() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->criticalFromEx( $ex, 'bar' );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::CRITICAL, $logEntry->level );
+        self::assertSame( 'bar', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
     public function testDebug() : void {
         $log = new BufferLogger();
         $rContext = [ 'foo' => 'bar' ];
@@ -65,6 +114,28 @@ final class BufferLoggerTest extends TestCase {
     }
 
 
+    public function testDebugFromEx() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->debugFromEx( $ex );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::DEBUG, $logEntry->level );
+        self::assertSame( 'foo', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
+    public function testDebugFromExWithMessage() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->debugFromEx( $ex, 'bar' );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::DEBUG, $logEntry->level );
+        self::assertSame( 'bar', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
     public function testEmergency() : void {
         $log = new BufferLogger();
         $rContext = [ 'foo' => 'bar' ];
@@ -74,6 +145,28 @@ final class BufferLoggerTest extends TestCase {
         self::assertSame( LogLevel::EMERGENCY, $log->level );
         self::assertSame( 'Test', $log->message );
         self::assertSame( $rContext, $log->context );
+    }
+
+
+    public function testEmergencyFromEx() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->emergencyFromEx( $ex );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::EMERGENCY, $logEntry->level );
+        self::assertSame( 'foo', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
+    public function testEmergencyFromExWithMessage() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->emergencyFromEx( $ex, 'bar' );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::EMERGENCY, $logEntry->level );
+        self::assertSame( 'bar', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
     }
 
 
@@ -99,6 +192,28 @@ final class BufferLoggerTest extends TestCase {
     }
 
 
+    public function testErrorFromEx() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->errorFromEx( $ex );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::ERROR, $logEntry->level );
+        self::assertSame( 'foo', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
+    public function testErrorFromExWithMessage() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->errorFromEx( $ex, 'bar' );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::ERROR, $logEntry->level );
+        self::assertSame( 'bar', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
     public function testInfo() : void {
         $log = new BufferLogger();
         $rContext = [ 'foo' => 'bar' ];
@@ -108,6 +223,28 @@ final class BufferLoggerTest extends TestCase {
         self::assertSame( LogLevel::INFO, $log->level );
         self::assertSame( 'Test', $log->message );
         self::assertSame( $rContext, $log->context );
+    }
+
+
+    public function testInfoFromEx() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->infoFromEx( $ex );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::INFO, $logEntry->level );
+        self::assertSame( 'foo', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
+    public function testInfoFromExWithMessage() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->errorFromEx( $ex, 'bar' );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::ERROR, $logEntry->level );
+        self::assertSame( 'bar', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
     }
 
 
@@ -132,6 +269,28 @@ final class BufferLoggerTest extends TestCase {
         self::assertSame( LogLevel::NOTICE, $log->level );
         self::assertSame( 'Test', $log->message );
         self::assertSame( $rContext, $log->context );
+    }
+
+
+    public function testNoticeFromEx() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->noticeFromEx( $ex );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::NOTICE, $logEntry->level );
+        self::assertSame( 'foo', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
+    public function testNoticeFromExWithMessage() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->noticeFromEx( $ex, 'bar' );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::NOTICE, $logEntry->level );
+        self::assertSame( 'bar', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
     }
 
 
@@ -168,6 +327,28 @@ final class BufferLoggerTest extends TestCase {
         self::assertSame( LogLevel::WARNING, $log->level );
         self::assertSame( 'Test', $log->message );
         self::assertSame( $rContext, $log->context );
+    }
+
+
+    public function testWarningFromEx() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->warningFromEx( $ex );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::WARNING, $logEntry->level );
+        self::assertSame( 'foo', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
+    public function testWarningFromExWithMessage() : void {
+        $ex = new Exception( 'foo' );
+        $logger = new BufferLogger();
+        $logger->warningFromEx( $ex, 'bar' );
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::WARNING, $logEntry->level );
+        self::assertSame( 'bar', $logEntry->message );
+        self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
     }
 
 

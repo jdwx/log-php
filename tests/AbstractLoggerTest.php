@@ -20,7 +20,7 @@ final class AbstractLoggerTest extends TestCase {
 
     /**
      * @noinspection PhpDeprecationInspection
-     * @suppress PhanDeprecatedFunction
+     * @suppress     PhanDeprecatedFunction
      */
     public function testCompareLevels() : void {
         self::assertSame( 0, AbstractLogger::compareLevels( 'emergency', LOG_EMERG ) );
@@ -49,7 +49,7 @@ final class AbstractLoggerTest extends TestCase {
 
     /**
      * @noinspection PhpDeprecationInspection
-     * @suppress PhanDeprecatedFunction
+     * @suppress     PhanDeprecatedFunction
      */
     public function testNormalizeLevel() : void {
         self::assertSame( LogLevel::EMERGENCY, AbstractLogger::normalizeLevel( 'emergency' ) );
@@ -67,7 +67,7 @@ final class AbstractLoggerTest extends TestCase {
 
     /**
      * @noinspection PhpDeprecationInspection
-     * @suppress PhanDeprecatedFunction
+     * @suppress     PhanDeprecatedFunction
      */
     public function testNormalizeLevelEx() : void {
         self::assertSame( LogLevel::EMERGENCY, AbstractLogger::normalizeLevelEx( 'emergency' ) );
@@ -78,7 +78,7 @@ final class AbstractLoggerTest extends TestCase {
 
     /**
      * @noinspection PhpDeprecationInspection
-     * @suppress PhanDeprecatedFunction
+     * @suppress     PhanDeprecatedFunction
      */
     public function testNormalizeLevelInt() : void {
         self::assertSame( 0, AbstractLogger::normalizeLevelInt( 'emergency' ) );
@@ -99,7 +99,7 @@ final class AbstractLoggerTest extends TestCase {
 
     /**
      * @noinspection PhpDeprecationInspection
-     * @suppress PhanDeprecatedFunction
+     * @suppress     PhanDeprecatedFunction
      */
     public function testNormalizeLevelIntEx() : void {
         self::assertSame( 0, AbstractLogger::normalizeLevelIntEx( 'emergency' ) );
@@ -110,7 +110,7 @@ final class AbstractLoggerTest extends TestCase {
 
     /**
      * @noinspection PhpDeprecationInspection
-     * @suppress PhanDeprecatedFunction
+     * @suppress     PhanDeprecatedFunction
      */
     public function testNormalizeLevelIntExForBadValue() : void {
         $this->expectException( InvalidArgumentException::class );
@@ -120,7 +120,7 @@ final class AbstractLoggerTest extends TestCase {
 
     /**
      * @noinspection PhpDeprecationInspection
-     * @suppress PhanDeprecatedFunction
+     * @suppress     PhanDeprecatedFunction
      */
     public function testNormalizeLevelIntExForWrongType() : void {
         $this->expectException( InvalidArgumentException::class );
