@@ -15,6 +15,7 @@ use Throwable;
 trait LoggerExtraTrait {
 
 
+    /** @param array<int|string, mixed> $i_rContext */
     public function alertFromEx( Throwable $i_ex, string|Stringable|null $i_nstMessage = null,
                                  array     $i_rContext = [] ) : void {
         $stMessage = $i_nstMessage ?? $i_ex->getMessage();
@@ -32,6 +33,7 @@ trait LoggerExtraTrait {
     }
 
 
+    /** @param array<int|string, mixed> $i_rContext */
     public function debugFromEx( Throwable $i_ex, string|Stringable|null $i_nstMessage = null,
                                  array     $i_rContext = [] ) : void {
         $stMessage = $i_nstMessage ?? $i_ex->getMessage();
@@ -40,6 +42,7 @@ trait LoggerExtraTrait {
     }
 
 
+    /** @param array<int|string, mixed> $i_rContext */
     public function emergencyFromEx( Throwable $i_ex, string|Stringable|null $i_nstMessage = null,
                                      array     $i_rContext = [] ) : void {
         $stMessage = $i_nstMessage ?? $i_ex->getMessage();
