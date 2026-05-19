@@ -16,6 +16,13 @@ use Psr\Log\LogLevel;
 class LoggerDecoratorTest extends TestCase {
 
 
+    public function testGetLogger() : void {
+        $log = new BufferLogger();
+        $deco = new LoggerDecorator( $log );
+        self::assertSame( $log, $deco->getLogger() );
+    }
+
+
     public function testLog() : void {
         $log = new BufferLogger();
         $deco = new LoggerDecorator( $log );

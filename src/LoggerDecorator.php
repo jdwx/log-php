@@ -10,6 +10,10 @@ namespace JDWX\Log;
 use Stringable;
 
 
+/**
+ * This class is used to make a PSR LoggerInterface
+ * compatible with the LoggerInterface in this library.
+ */
 class LoggerDecorator implements LoggerInterface {
 
 
@@ -17,6 +21,11 @@ class LoggerDecorator implements LoggerInterface {
 
 
     public function __construct( private readonly \Psr\Log\LoggerInterface $logger ) {
+    }
+
+
+    public function getLogger() : \Psr\Log\LoggerInterface {
+        return $this->logger;
     }
 
 
