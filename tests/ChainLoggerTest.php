@@ -11,11 +11,36 @@ use JDWX\Log\BufferLogger;
 use JDWX\Log\ChainLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
+use Stringable;
 
 
 #[CoversClass( ChainLogger::class )]
 final class ChainLoggerTest extends TestCase {
+
+
+    public function testGetLogger() : void {
+        $chain = new ChainLogger();
+        self::assertNull( $chain->getLogger() );
+        $buf = new BufferLogger();
+        $chain->push( $buf );
+        self::assertSame( $chain, $chain->getLogger() );
+    }
+
+
+    public function testGetLoggerForPsrLogger() : void {
+        $logger = new class extends AbstractLogger {
+
+
+            /** @param array<int|string, mixed> $context */
+            public function log( $level, string|Stringable $message, array $context = [] ) : void {}
+
+
+        };
+        $chain = new ChainLogger( $logger );
+        self::assertSame( $chain, $chain->getLogger() );
+    }
 
 
     public function testLog() : void {

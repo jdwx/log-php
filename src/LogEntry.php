@@ -42,7 +42,7 @@ readonly class LogEntry implements Stringable, LogEntryInterface, JsonSerializab
 
 
     public function interpolatedMessage() : string {
-        return FormattedLogger::interpolate( $this->message, $this->context );
+        return LogTools::interpolate( $this->message, $this->context );
     }
 
 
@@ -51,7 +51,7 @@ readonly class LogEntry implements Stringable, LogEntryInterface, JsonSerializab
         return [
             'level' => $this->level,
             'message' => $this->interpolatedMessage(),
-            'context' => FormattedLogger::value( $this->context ),
+            'context' => LogTools::value( $this->context ),
         ];
     }
 

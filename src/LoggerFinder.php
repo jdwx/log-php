@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use RuntimeException;
 
 
@@ -26,20 +27,29 @@ use RuntimeException;
  * This is objectively inferior to proper service discovery, but
  * is better than nothing when explicit dependency on a certain service
  * discovery infrastructure is untenable.
+ *
+ * Note: this class doesn't have any known users. It has been deprecated and
+ * will be removed in 3.0. But if anyone is using it, let us know and we will
+ * revert the deprecation. We just don't want to maintain this complicated
+ * (and someone convoluted) logic if no one is using it.
+ *
+ * @deprecated No known users.
+ *
  */
 class LoggerFinder implements HasLoggerInterface {
 
 
-    public function __construct( private ?LoggerInterface $logger = null,
-                                 private readonly string  $stRegistryId = LoggerRegistry::DEFAULT_LOGGER_ID ) {
-    }
+    public function __construct( private ?PsrLoggerInterface $logger = null,
+                                 private readonly string     $stRegistryId = LoggerRegistry::DEFAULT_LOGGER_ID ) {}
 
 
     /**
      * @param mixed ...$rOptions All options to try to find a logger, in order of preference.
-     * @return LoggerInterface|null
+     * @return PsrLoggerInterface|null
+     * @suppress     PhanDeprecatedClass
+     * @noinspection PhpDeprecationInspection
      */
-    public static function find( mixed ...$rOptions ) : ?LoggerInterface {
+    public static function find( mixed ...$rOptions ) : ?PsrLoggerInterface {
         return ( new self() )->try( ...$rOptions )->getLogger();
     }
 
@@ -47,14 +57,16 @@ class LoggerFinder implements HasLoggerInterface {
     /**
      * @param string $i_stClass   The class that insists on having a logger available.
      * @param mixed  ...$rOptions All options to try to find a logger, in order of preference.
-     * @return LoggerInterface
+     * @return PsrLoggerInterface
+     * @suppress     PhanDeprecatedClass
+     * @noinspection PhpDeprecationInspection
      */
-    public static function findEx( string $i_stClass, mixed ...$rOptions ) : LoggerInterface {
+    public static function findEx( string $i_stClass, mixed ...$rOptions ) : PsrLoggerInterface {
         return ( new self() )->try( ...$rOptions )->getLoggerEx( $i_stClass );
     }
 
 
-    public function getLogger() : ?LoggerInterface {
+    public function getLogger() : ?PsrLoggerInterface {
         $this->lastDitchEffort();
         return $this->logger;
     }
@@ -73,7 +85,16 @@ class LoggerFinder implements HasLoggerInterface {
     }
 
 
-    public function try( mixed ...$rOptions ) : static {
+    public function hasLogger() : bool {
+        return $this->getLogger() instanceof LoggerInterface;
+    }
+
+
+    /**
+     * @noinspection PhpDeprecationInspection
+     * @suppress     PhanDeprecatedClass
+     */
+    public function try( mixed ...$rOptions ) : self {
         foreach ( $rOptions as $x ) {
             $this->logger ??= $this->unwind( $x );
         }
@@ -89,7 +110,7 @@ class LoggerFinder implements HasLoggerInterface {
     }
 
 
-    private function unwind( mixed $i_logger ) : ?LoggerInterface {
+    private function unwind( mixed $i_logger ) : ?PsrLoggerInterface {
         if ( $i_logger instanceof HasLoggerInterface ) {
             $logger = $i_logger->getLogger();
             # $i_logger is not null, and $i_logger->getLogger() returns ?LoggerInterface,

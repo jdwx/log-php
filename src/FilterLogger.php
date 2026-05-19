@@ -10,11 +10,10 @@ namespace JDWX\Log;
 use Stringable;
 
 
-abstract class FilterLogger extends AbstractLogger {
+abstract class FilterLogger extends AbstractDirectLogger {
 
 
-    public function __construct( private readonly LoggerInterface $logger ) {
-    }
+    public function __construct( private readonly \Psr\Log\LoggerInterface $logger ) {}
 
 
     /**

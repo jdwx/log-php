@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpDeprecationInspection */
 
 
 declare( strict_types = 1 );
@@ -44,6 +44,7 @@ final class LoggerFinderTest extends TestCase {
     }
 
 
+    /** @suppress PhanDeprecatedClass */
     public function testGetLoggerEx() : void {
         $buffer = new BufferLogger();
         $finder = new LoggerFinder( $buffer );
@@ -55,6 +56,7 @@ final class LoggerFinderTest extends TestCase {
     }
 
 
+    /** @suppress PhanDeprecatedClass */
     public function testGetLoggerForConstructor() : void {
         $buffer = new BufferLogger();
         $finder = new LoggerFinder( $buffer );
@@ -62,12 +64,18 @@ final class LoggerFinderTest extends TestCase {
     }
 
 
+    /** @suppress PhanDeprecatedClass */
     public function testGetLoggerForContainerNotLogger() : void {
         $x = new class implements HasLoggerInterface {
 
 
             public function getLogger() : LoggerInterface {
                 return new BufferLogger();
+            }
+
+
+            public function hasLogger() : bool {
+                return true;
             }
 
 
@@ -78,6 +86,7 @@ final class LoggerFinderTest extends TestCase {
     }
 
 
+    /** @suppress PhanDeprecatedClass */
     public function testGetLoggerForContainerReturnsNull() : void {
         $x = new class implements HasLoggerInterface, LoggerInterface {
 
@@ -90,8 +99,12 @@ final class LoggerFinderTest extends TestCase {
             }
 
 
-            public function log( $level, Stringable|string $message, array $context = [] ) : void {
+            public function hasLogger() : bool {
+                return false;
             }
+
+
+            public function log( $level, Stringable|string $message, array $context = [] ) : void {}
 
 
         };
@@ -101,6 +114,7 @@ final class LoggerFinderTest extends TestCase {
     }
 
 
+    /** @suppress PhanDeprecatedClass */
     public function testGetLoggerForContainerReturnsSelf() : void {
         $x = new class implements HasLoggerInterface, LoggerInterface {
 
@@ -113,8 +127,12 @@ final class LoggerFinderTest extends TestCase {
             }
 
 
-            public function log( $level, Stringable|string $message, array $context = [] ) : void {
+            public function hasLogger() : bool {
+                return true;
             }
+
+
+            public function log( $level, Stringable|string $message, array $context = [] ) : void {}
 
 
         };
@@ -124,12 +142,14 @@ final class LoggerFinderTest extends TestCase {
     }
 
 
+    /** @suppress PhanDeprecatedClass */
     public function testGetLoggerForNothing() : void {
         $finder = new LoggerFinder();
         self::assertNull( $finder->getLogger() );
     }
 
 
+    /** @suppress PhanDeprecatedClass */
     public function testGetLoggerForRegistry() : void {
         $finder = new LoggerFinder( stRegistryId: 'jdwx.log.foo' );
         self::assertNull( $finder->getLogger() );
@@ -147,6 +167,7 @@ final class LoggerFinderTest extends TestCase {
     }
 
 
+    /** @suppress PhanDeprecatedClass */
     public function testGetLoggerForSelf() : void {
         $finder = new LoggerFinder();
         $finder->try( $finder );
@@ -154,6 +175,7 @@ final class LoggerFinderTest extends TestCase {
     }
 
 
+    /** @suppress PhanDeprecatedClass */
     public function testGetLoggerForTry() : void {
         $finder = new LoggerFinder();
         $buffer = new BufferLogger();
@@ -174,6 +196,17 @@ final class LoggerFinderTest extends TestCase {
     }
 
 
+    /** @suppress PhanDeprecatedClass */
+    public function testHasLogger() : void {
+        $buffer = new BufferLogger();
+        $finder = new LoggerFinder();
+        self::assertFalse( $finder->hasLogger() );
+        $finder->try( $buffer );
+        self::assertTrue( $finder->hasLogger() );
+    }
+
+
+    /** @suppress PhanDeprecatedClass */
     public function testTryWithSeveral() : void {
         $finder = new LoggerFinder();
         $buffer = new BufferLogger();

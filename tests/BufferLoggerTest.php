@@ -8,7 +8,7 @@ namespace JDWX\Log\Tests;
 
 
 use Exception;
-use JDWX\Log\AbstractLogger;
+use JDWX\Log\AbstractDirectLogger;
 use JDWX\Log\BufferLogger;
 use JDWX\Log\LogEntry;
 use JDWX\Log\LoggerExtraTrait;
@@ -18,7 +18,7 @@ use Psr\Log\LogLevel;
 use RuntimeException;
 
 
-#[CoversClass( AbstractLogger::class )]
+#[CoversClass( AbstractDirectLogger::class )]
 #[CoversClass( BufferLogger::class )]
 #[CoversClass( LoggerExtraTrait::class )]
 final class BufferLoggerTest extends TestCase {
@@ -211,6 +211,18 @@ final class BufferLoggerTest extends TestCase {
         self::assertSame( LogLevel::ERROR, $logEntry->level );
         self::assertSame( 'bar', $logEntry->message );
         self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
+    public function testGetLogger() : void {
+        $buf = new BufferLogger();
+        self::assertSame( $buf, $buf->getLogger() );
+    }
+
+
+    public function testHasLogger() : void {
+        $buf = new BufferLogger();
+        self::assertTrue( $buf->hasLogger() );
     }
 
 

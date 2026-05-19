@@ -15,7 +15,7 @@ use Stringable;
  *
  * A logger that throws away everything logged.
  */
-class NullLogger extends AbstractLogger {
+class NullLogger extends AbstractDirectLogger {
 
 
     public function getLogger() : ?LoggerInterface {

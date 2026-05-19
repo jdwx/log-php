@@ -15,7 +15,7 @@ use Stringable;
  * This is a base class for log backends where it is more efficient to write a bunch
  * of entries at once.
  */
-abstract class AbstractBatchLogger extends AbstractLogger {
+abstract class AbstractBatchLogger extends AbstractDirectLogger {
 
 
     /** @var list<LogEntry> */
@@ -56,7 +56,7 @@ abstract class AbstractBatchLogger extends AbstractLogger {
     public function log( $level, string|Stringable $message, array $context = [] ) : void {
         $level = LogLevels::toStringEx( $level );
         $this->rEntries[] = new LogEntry(
-            $level, FormattedLogger::interpolate( $message, $context ), FormattedLogger::value( $context )
+            $level, LogTools::interpolate( $message, $context ), LogTools::value( $context )
         );
         $this->level = LogLevels::toStringEx( LogLevels::mostSevere( $this->level, $level ) );
     }

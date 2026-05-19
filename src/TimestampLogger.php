@@ -15,7 +15,7 @@ use DateTimeZone;
  * Adds a timestamp to each log message. This is most useful in conjunction with
  * StderrLogger, which just dumps the log to stderr without decoration.
  */
-class TimestampLogger extends AbstractLogger {
+class TimestampLogger extends AbstractDirectLogger {
 
 
     private readonly ?DateTimeZone $timezone;

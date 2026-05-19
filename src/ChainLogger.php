@@ -7,24 +7,42 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Stringable;
 
 
-class ChainLogger implements LoggerInterface {
+class ChainLogger extends AbstractDirectLogger {
 
 
-    use LoggerTrait;
-
-
-    /** @var list<LoggerInterface> */
+    /** @var list<PsrLoggerInterface> */
     private array $loggers = [];
 
 
-    /** @param list<LoggerInterface>|LoggerInterface ...$i_loggers */
-    public function __construct( array|LoggerInterface ...$i_loggers ) {
+    /** @param list<PsrLoggerInterface>|PsrLoggerInterface ...$i_loggers */
+    public function __construct( array|PsrLoggerInterface ...$i_loggers ) {
         foreach ( $i_loggers as $logger ) {
             $this->push( $logger );
         }
+    }
+
+
+    /**
+     * @return PsrLoggerInterface|null
+     *
+     * Because this is considered a direct logger, it returns itself if it
+     * finds any suitable loggers.
+     */
+    public function getLogger() : ?PsrLoggerInterface {
+        foreach ( $this->loggers as $logger ) {
+            if ( ! $logger instanceof HasLoggerInterface ) {
+                return $this;
+            }
+            $x = $logger->getLogger();
+            if ( $x instanceof PsrLoggerInterface ) {
+                return $this;
+            }
+        }
+        return null;
     }
 
 
@@ -42,10 +60,10 @@ class ChainLogger implements LoggerInterface {
 
 
     /**
-     * @param list<LoggerInterface>|LoggerInterface $logger
+     * @param list<PsrLoggerInterface>|PsrLoggerInterface $logger
      * @return void
      */
-    public function push( array|LoggerInterface $logger ) : void {
+    public function push( array|PsrLoggerInterface $logger ) : void {
         if ( ! is_array( $logger ) ) {
             $this->loggers[] = $logger;
             return;

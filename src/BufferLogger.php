@@ -12,7 +12,7 @@ use RuntimeException;
 use Stringable;
 
 
-class BufferLogger extends AbstractLogger implements Countable {
+class BufferLogger extends AbstractDirectLogger implements Countable {
 
 
     /** @var LogEntry[] */
