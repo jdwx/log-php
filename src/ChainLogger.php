@@ -9,6 +9,7 @@ namespace JDWX\Log;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
+use Stringable;
 
 
 class ChainLogger implements LoggerInterface {
@@ -35,7 +36,7 @@ class ChainLogger implements LoggerInterface {
      *
      * Does not check level; relies on underlying loggers to do that.
      */
-    public function log( mixed $level, \Stringable|string $message, array $context = [] ) : void {
+    public function log( mixed $level, string|Stringable $message, array $context = [] ) : void {
         foreach ( $this->loggers as $logger ) {
             $logger->log( $level, $message, $context );
         }
