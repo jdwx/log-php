@@ -16,6 +16,14 @@ class ContextDecoratorLogger extends AbstractContextDecoratorLogger {
     }
 
 
+    /** @param array<int|string, mixed> $i_rContext */
+    public function addContext( array $i_rContext ) : void {
+        foreach ( $i_rContext as $k => $v ) {
+            $this->setContext( $k, $v );
+        }
+    }
+
+
     public function getContext( int|string $i_key, int|string|null $i_subKey = null ) : mixed {
         if ( ! is_null( $i_subKey ) ) {
             return $this->rExtraContext[ $i_key ][ $i_subKey ] ?? null;

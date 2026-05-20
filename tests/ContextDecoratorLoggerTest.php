@@ -20,6 +20,22 @@ use Psr\Log\LogLevel;
 final class ContextDecoratorLoggerTest extends TestCase {
 
 
+    public function testAddContext() : void {
+        $buffer = new BufferLogger();
+        $decorator = new ContextDecoratorLogger( $buffer );
+        $decorator->addContext( [
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ] );
+        $decorator->log( LogLevel::INFO, 'quux' );
+
+        $log = $buffer->shiftLogEx();
+        self::assertSame( 'quux', $log->message );
+        self::assertSame( 'bar', $log->context[ 'foo' ] );
+        self::assertSame( 'qux', $log->context[ 'baz' ] );
+    }
+
+
     public function testGetContext() : void {
         $buffer = new BufferLogger();
         $decorator = new ContextDecoratorLogger( $buffer, [
