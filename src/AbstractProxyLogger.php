@@ -18,6 +18,14 @@ abstract class AbstractProxyLogger extends AbstractLogger implements HasLoggerIn
     use LoggerExtraTrait;
 
 
+    public function flushLog() : void {
+        $logger = $this->getLogger();
+        if ( $logger instanceof LoggerInterface ) {
+            $logger->flushLog();
+        }
+    }
+
+
     public function hasLogger() : bool {
         $logger = $this->getLogger();
         if ( $logger instanceof HasLoggerInterface ) {

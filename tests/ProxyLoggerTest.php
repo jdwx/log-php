@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log\Tests;
 
 
+use JDWX\Log\AbstractDirectLogger;
 use JDWX\Log\AbstractProxyLogger;
 use JDWX\Log\BufferLogger;
 use JDWX\Log\ProxyLogger;
@@ -20,6 +21,29 @@ use Stringable;
 #[CoversClass( AbstractProxyLogger::class )]
 #[CoversClass( ProxyLogger::class )]
 final class ProxyLoggerTest extends TestCase {
+
+
+    public function testFlushLog() : void {
+        $logger = new class extends AbstractDirectLogger {
+
+
+            public bool $bFlushed = false;
+
+
+            public function flushLog() : void {
+                $this->bFlushed = true;
+            }
+
+
+            public function log( $level, Stringable|string $message, array $context = [] ) : void {}
+
+
+        };
+        $proxy = new ProxyLogger();
+        $proxy->setLogger( $logger );
+        $proxy->flushLog();
+        self::assertTrue( $logger->bFlushed );
+    }
 
 
     public function testGetLogger() : void {
