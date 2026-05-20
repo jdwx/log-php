@@ -39,12 +39,12 @@ class LogTools {
     }
 
 
-    /** @param array<int|string, mixed> $context
-     * @noinspection PhpCastIsUnnecessaryInspection
+    /**
+     * @param array<int|string, mixed> $i_rContext
      */
-    public static function interpolate( string|Stringable $message, array $context ) : string {
+    public static function interpolate( string|Stringable $i_message, array $i_rContext ) : string {
         $replace = [];
-        foreach ( $context as $key => $val ) {
+        foreach ( $i_rContext as $key => $val ) {
             # check that the key doesn't contain any invalid characters
             $key = strval( $key ); # stupid integer key quirk
             if ( ! preg_match( '/^[a-zA-Z0-9_.]+$/', $key ) ) {
@@ -57,13 +57,12 @@ class LogTools {
             }
         }
 
-        # interpolate replacement values into the message and return
-        return strtr( strval( $message ), $replace );
+        return strtr( strval( $i_message ), $replace );
     }
 
 
     /**
-     * @param mixed $xValue The input value.
+     * @param mixed $i_xValue The input value.
      * @return mixed The loggable value.
      *
      * Prepare an arbitrary value to be represented in a log context without
@@ -71,38 +70,40 @@ class LogTools {
      * will be a scalar type, a string, or an array (possible nested) of scalar
      * types or strings.
      */
-    public static function value( mixed $xValue ) : mixed {
-        if ( is_int( $xValue ) || is_float( $xValue ) || is_bool( $xValue ) || is_null( $xValue )
-            || is_string( $xValue ) ) {
-            return $xValue;
-        }
-        if ( is_array( $xValue ) ) {
-            return array_map( fn( $x ) => self::value( $x ), $xValue );
-        }
-        if ( is_resource( $xValue ) ) {
-            return '(resource)';
-        }
-
-        if ( ! is_object( $xValue ) ) {
+    public static function value( mixed $i_xValue, ?int $i_nuPropertyCount = 5 ) : mixed {
+        $x = match ( true ) {
+            is_bool( $i_xValue ), is_float( $i_xValue ), is_int( $i_xValue ),
+            is_null( $i_xValue ), is_string( $i_xValue ) => $i_xValue,
+            is_array( $i_xValue ) =>
+            is_int( $i_nuPropertyCount )
+                ? array_slice( array_map( fn( $x ) => self::value( $x ), $i_xValue ), 0, $i_nuPropertyCount )
+                : array_map( fn( $x ) => self::value( $x ), $i_xValue ),
+            is_resource( $i_xValue ) => get_resource_type( $i_xValue ) . '(' . get_resource_id( $i_xValue ) . ')',
             // @codeCoverageIgnoreStart
-            $stType = gettype( $xValue );
-            $stValue = strval( $xValue );
-            return "{$stType}({$stValue})";
+            ! is_object( $i_xValue ) => gettype( $i_xValue ) . '(' . $i_xValue . ')',
             // @codeCoverageIgnoreEnd
+            $i_xValue instanceof ContextSerializable => self::value( $i_xValue->contextSerialize() ),
+            $i_xValue instanceof JsonSerializable => self::value( $i_xValue->jsonSerialize() ),
+            $i_xValue instanceof Throwable => self::value( self::exceptionToArray( $i_xValue ) ),
+            $i_xValue instanceof \BackedEnum => $i_xValue::class . '( ' . $i_xValue->name . ': ' . $i_xValue->value . ')',
+            $i_xValue instanceof \UnitEnum => $i_xValue::class . '( ' . $i_xValue->name . ')',
+            $i_xValue instanceof Stringable => $i_xValue::class . '(' . $i_xValue->__toString() . ')',
+            default => self::valueObject( $i_xValue, $i_nuPropertyCount ),
+        };
+        if ( is_string( $x ) ) {
+            $x = str_replace( [ "\t", "\n", "\r", chr( 0 ) ], [ '\\t', '\\n', '\\r', '\\0' ], $x );
         }
-        if ( $xValue instanceof ContextSerializable ) {
-            return self::value( $xValue->contextSerialize() );
+        return $x;
+    }
+
+
+    public static function valueObject( object $i_obj, ?int $i_nuPropertyCount ) : string {
+        if ( method_exists( $i_obj, '__debugInfo' ) ) {
+            $rProperties = $i_obj->__debugInfo();
+        } else {
+            $rProperties = get_object_vars( $i_obj );
         }
-        if ( $xValue instanceof JsonSerializable ) {
-            return self::value( $xValue->jsonSerialize() );
-        }
-        if ( $xValue instanceof Throwable ) {
-            return self::value( self::exceptionToArray( $xValue ) );
-        }
-        if ( $xValue instanceof Stringable ) {
-            return strval( $xValue );
-        }
-        return $xValue::class;
+        return self::valueObjectProperties( $i_obj::class, spl_object_id( $i_obj ), $rProperties, $i_nuPropertyCount );
     }
 
 
@@ -145,6 +146,36 @@ class LogTools {
         }
         $st .= "{$stIndent}}\n";
         return $st;
+    }
+
+
+    /** @param array<int|string, mixed> $i_rProperties */
+    private static function valueObjectProperties( string $i_stClass, ?int $i_nuID, array $i_rProperties,
+                                                   ?int   $i_nuPropertyCount ) : string {
+
+        $bTooMany = is_int( $i_nuPropertyCount ) && count( $i_rProperties ) > $i_nuPropertyCount;
+        if ( $bTooMany ) {
+            $i_rProperties = array_slice( $i_rProperties, 0, $i_nuPropertyCount );
+        }
+        $rOut = [];
+        $uCount = 0;
+        foreach ( $i_rProperties as $k => $v ) {
+            $rOut[] = "{$k}:{$v}";
+            if ( $bTooMany && ++$uCount >= $i_nuPropertyCount ) {
+                break;
+            }
+        }
+        if ( $bTooMany ) {
+            $rOut[] = '...';
+        }
+        $stProperties = implode( ', ', $rOut );
+        if ( is_int( $i_nuID ) ) {
+            $i_stClass .= "#{$i_nuID}";
+        }
+        if ( $stProperties ) {
+            $i_stClass .= "({$stProperties})";
+        }
+        return $i_stClass;
     }
 
 

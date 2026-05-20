@@ -194,13 +194,36 @@ final class LogToolsTest extends TestCase {
 
 
     public function testValueForObject() : void {
-        self::assertSame( $this::class, LogTools::value( $this ) );
+        $st = LogTools::value( $this );
+        self::assertSame( $this::class . '#' . spl_object_id( $this ), $st );
+    }
+
+
+    public function testValueForObjectWithDebugInfo() : void {
+        $x = new class {
+
+
+            public function __debugInfo() : array {
+                return [
+                    'foo' => 'bar',
+                    'baz' => 'qux',
+                    'quux' => 'corge',
+                    'grault' => 'garply',
+                ];
+            }
+
+
+        };
+        $st = LogTools::value( $x, 2 );
+        self::assertStringContainsString( 'class@anonymous', $st );
+        self::assertStringContainsString( '\\0' . __FILE__ . ':', $st );
+        self::assertStringContainsString( '(foo:bar, baz:qux, ...)', $st );
     }
 
 
     public function testValueForResource() : void {
         $f = fopen( 'php://memory', 'r' );
-        self::assertSame( '(resource)', LogTools::value( $f ) );
+        self::assertStringContainsString( 'stream(', LogTools::value( $f ) );
     }
 
 
@@ -215,7 +238,9 @@ final class LogToolsTest extends TestCase {
 
         };
 
-        self::assertSame( 'test', LogTools::value( $str ) );
+        $st = LogTools::value( $str );
+        self::assertStringContainsString( "Stringable@anonymous\\0" . __FILE__, $st );
+        self::assertStringContainsString( '(test)', $st );
     }
 
 
