@@ -17,7 +17,7 @@ use Psr\Log\LogLevel;
 
 #[CoversClass( AbstractContextDecoratorLogger::class )]
 #[CoversClass( ContextDecoratorLogger::class )]
-final class ContextDecoratorTest extends TestCase {
+final class ContextDecoratorLoggerTest extends TestCase {
 
 
     public function testGetContext() : void {
