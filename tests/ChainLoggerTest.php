@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log\Tests;
 
 
+use JDWX\Log\AbstractDirectLogger;
 use JDWX\Log\BufferLogger;
 use JDWX\Log\ChainLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -18,6 +19,30 @@ use Stringable;
 
 #[CoversClass( ChainLogger::class )]
 final class ChainLoggerTest extends TestCase {
+
+
+    public function testFlushLog() : void {
+        $logger = new class extends AbstractDirectLogger {
+
+
+            public bool $bFlushed = false;
+
+
+            public function flushLog() : void {
+                $this->bFlushed = true;
+            }
+
+
+            public function log( $level, Stringable|string $message, array $context = [] ) : void {}
+
+
+        };
+        $chain = new ChainLogger( $logger );
+        self::assertFalse( $logger->bFlushed );
+        $chain->flushLog();
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
+        self::assertTrue( $logger->bFlushed );
+    }
 
 
     public function testGetLogger() : void {

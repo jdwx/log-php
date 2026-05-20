@@ -26,6 +26,15 @@ class ChainLogger extends AbstractDirectLogger {
     }
 
 
+    public function flushLog() : void {
+        foreach ( $this->loggers as $logger ) {
+            if ( $logger instanceof LoggerInterface ) {
+                $logger->flushLog();
+            }
+        }
+    }
+
+
     /**
      * @return PsrLoggerInterface|null
      *
