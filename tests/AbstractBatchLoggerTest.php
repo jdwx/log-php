@@ -29,8 +29,7 @@ final class AbstractBatchLoggerTest extends TestCase {
              * @noinspection PhpPropertyOnlyWrittenInspection
              * @phpstan-ignore-next-line
              */
-            public function __construct( private string &$stLevel, private array &$rMessage, private array &$rCommonContext ) {
-            }
+            public function __construct( private string &$stLevel, private array &$rMessage, private array &$rCommonContext ) {}
 
 
             protected function batch( string $i_stLevel, array $i_rLogMessages, array $i_rCommonContext ) : void {
@@ -101,8 +100,7 @@ final class AbstractBatchLoggerTest extends TestCase {
              * @noinspection PhpPropertyOnlyWrittenInspection
              * @phpstan-ignore-next-line
              */
-            public function __construct( private string &$stLevel, private array &$rEntries, private array &$rCommonContext ) {
-            }
+            public function __construct( private string &$stLevel, private array &$rEntries, private array &$rCommonContext ) {}
 
 
             protected function batch( string $i_stLevel, array $i_rLogMessages, array $i_rCommonContext ) : void {

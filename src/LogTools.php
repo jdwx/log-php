@@ -15,10 +15,33 @@ use Throwable;
 class LogTools {
 
 
+    public static function escape( mixed $i_x ) : mixed {
+        return match ( true ) {
+            is_string( $i_x ) => str_replace( [ "\t", "\n", "\r", chr( 0 ) ], [ '\\t', '\\n', '\\r', '\\0' ], $i_x ),
+            is_array( $i_x ) => self::escapeArray( $i_x ),
+            default => $i_x,
+        };
+    }
+
+
+    /**
+     * @param array<int|string, mixed> $i_r
+     * @return array<int|string, mixed>
+     */
+    public static function escapeArray( array $i_r ) : array {
+        $rOut = [];
+        foreach ( $i_r as $k => $v ) {
+            $rOut[ self::escape( $k ) ] = self::escape( $v );
+        }
+        return $rOut;
+    }
+
+
     /** @return array<string, mixed> */
-    public static function exceptionToArray( Throwable $x ) : array {
+    public static function exceptionToArray( Throwable $x, int $i_uDepth = 3, int $i_uPropertyCount = 6, ?VisitedCheck $i_visited = null ) : array {
+        $i_visited ??= new VisitedCheck();
         $r = [
-            'class' => get_class( $x ),
+            'class' => $x::class,
             'message' => $x->getMessage(),
             'code' => $x->getCode(),
             'file' => $x->getFile(),
@@ -27,7 +50,11 @@ class LogTools {
         ];
         $prev = $x->getPrevious();
         if ( $prev instanceof Throwable ) {
-            $r[ 'previous' ] = static::exceptionToArray( $prev );
+            if ( $i_uDepth <= 1 || ! $i_visited->visit( $prev ) ) {
+                $r[ 'previous' ] = $prev::class . '#' . spl_object_id( $prev );
+            } else {
+                $r[ 'previous' ] = static::exceptionToArray( $prev, $i_uDepth - 1, $i_uPropertyCount, $i_visited );
+            }
         }
         return $r;
     }
@@ -62,48 +89,106 @@ class LogTools {
 
 
     /**
+     * @param array<int|string, mixed> $i_rValues     The values to limit.
+     * @param int                      $i_uDepth      The number of levels to recurse into nested arrays and objects.
+     * @param int|null                 $i_nuMaxValues The maximum number of values to include in the output.
+     * @param ?VisitedCheck            $i_visited     List of classes that have already been seen.
+     * @return array<int|string, mixed> The input array with limited values.
+     *
+     * Used to limit arrays to a specified number of (loggable) values, considering both depth and number of elements.
+     * This is used to prevent spewing pages and pages of large objects into logs.
+     */
+    public static function limitArray( array         $i_rValues, int $i_uDepth = 3, ?int $i_nuMaxValues = 5,
+                                       ?VisitedCheck $i_visited = null ) : array {
+        if ( $i_uDepth < 1 ) {
+            $i_nuMaxValues = 0;
+        }
+
+        $bTooMany = is_int( $i_nuMaxValues ) && count( $i_rValues ) > $i_nuMaxValues;
+        if ( $bTooMany ) {
+            $i_rValues = array_slice( $i_rValues, 0, $i_nuMaxValues );
+        }
+        $rOut = [];
+        foreach ( $i_rValues as $k => $v ) {
+            $v = self::valueInner( $v, $i_uDepth - 1, $i_nuMaxValues, $i_visited );
+            $rOut[ $k ] = $v;
+        }
+        if ( $bTooMany ) {
+            $rOut[] = '...';
+        }
+        return $rOut;
+    }
+
+
+    /**
+     * @param object            $i_obj
+     * @param int               $i_uDepth
+     * @param int|null          $i_nuPropertyCount
+     * @param VisitedCheck|null $i_visited
+     * @return array<int|string, mixed> Object as array with class name and id as elements of the array.
+     */
+    public static function objectAsArray( object $i_obj, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5, ?VisitedCheck $i_visited = null ) : array {
+        $r = [
+            'object$class' => $i_obj::class,
+            'object$id' => spl_object_id( $i_obj ),
+        ];
+        if ( $i_uDepth < 1 ) {
+            return $r;
+        }
+        return array_merge( $r, self::objectProperties( $i_obj, $i_uDepth, $i_nuPropertyCount, $i_visited ) );
+    }
+
+
+    /**
+     * @param object        $i_obj             The object to extract properties from.
+     * @param int           $i_uDepth          The depth of recursion for nested objects.
+     * @param int|null      $i_nuPropertyCount The maximum number of properties to include.
+     * @param ?VisitedCheck $i_visited         List of classes that have already been seen.
+     * @return array<int|string, mixed>
+     *
+     * Gets (loggable) properties of an object, optionally limiting depth and number of properties.
+     */
+    public static function objectProperties( object $i_obj, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5, ?VisitedCheck $i_visited = null ) : array {
+        $rProperties = method_exists( $i_obj, '__debugInfo' )
+            ? $i_obj->__debugInfo()
+            : get_object_vars( $i_obj );
+        return self::limitArray( $rProperties, $i_uDepth, $i_nuPropertyCount, $i_visited );
+    }
+
+
+    /**
      * @param mixed $i_xValue The input value.
      * @return mixed The loggable value.
      *
      * Prepare an arbitrary value to be represented in a log context without
      * converting it to a string. I.e., after running this, the returned value
      * will be a scalar type, a string, or an array (possible nested) of scalar
-     * types or strings.
+     * types or strings. Objects that don't have a specific representation will
+     * be returned as arrays of their properties with additional keys
+     * object$class and object$id.
      */
-    public static function value( mixed $i_xValue, ?int $i_nuPropertyCount = 5 ) : mixed {
-        $x = match ( true ) {
-            is_bool( $i_xValue ), is_float( $i_xValue ), is_int( $i_xValue ),
-            is_null( $i_xValue ), is_string( $i_xValue ) => $i_xValue,
-            is_array( $i_xValue ) =>
-            is_int( $i_nuPropertyCount )
-                ? array_slice( array_map( fn( $x ) => self::value( $x ), $i_xValue ), 0, $i_nuPropertyCount )
-                : array_map( fn( $x ) => self::value( $x ), $i_xValue ),
-            is_resource( $i_xValue ) => get_resource_type( $i_xValue ) . '(' . get_resource_id( $i_xValue ) . ')',
-            // @codeCoverageIgnoreStart
-            ! is_object( $i_xValue ) => gettype( $i_xValue ) . '(' . $i_xValue . ')',
-            // @codeCoverageIgnoreEnd
-            $i_xValue instanceof ContextSerializable => self::value( $i_xValue->contextSerialize() ),
-            $i_xValue instanceof JsonSerializable => self::value( $i_xValue->jsonSerialize() ),
-            $i_xValue instanceof Throwable => self::value( self::exceptionToArray( $i_xValue ) ),
-            $i_xValue instanceof \BackedEnum => $i_xValue::class . '( ' . $i_xValue->name . ': ' . $i_xValue->value . ')',
-            $i_xValue instanceof \UnitEnum => $i_xValue::class . '( ' . $i_xValue->name . ')',
-            $i_xValue instanceof Stringable => $i_xValue::class . '(' . $i_xValue->__toString() . ')',
-            default => self::valueObject( $i_xValue, $i_nuPropertyCount ),
-        };
-        if ( is_string( $x ) ) {
-            $x = str_replace( [ "\t", "\n", "\r", chr( 0 ) ], [ '\\t', '\\n', '\\r', '\\0' ], $x );
-        }
-        return $x;
+    public static function value( mixed $i_xValue, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5 ) : mixed {
+        return self::escape( self::valueInner( $i_xValue, $i_uDepth, $i_nuPropertyCount ) );
     }
 
 
-    public static function valueObject( object $i_obj, ?int $i_nuPropertyCount ) : string {
-        if ( method_exists( $i_obj, '__debugInfo' ) ) {
-            $rProperties = $i_obj->__debugInfo();
-        } else {
-            $rProperties = get_object_vars( $i_obj );
+    /**
+     * @param object        $i_obj
+     * @param int           $i_uDepth
+     * @param int|null      $i_nuPropertyCount
+     * @param ?VisitedCheck $i_visited List of classes that have already been seen.
+     * @return array<int|string, mixed>|string
+     */
+    public static function valueObject( object $i_obj, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5, ?VisitedCheck $i_visited = null ) : array|string {
+        $i_visited ??= new VisitedCheck();
+        if ( ! $i_visited->visit( $i_obj ) ) {
+            $i_uDepth = 0;
         }
-        return self::valueObjectProperties( $i_obj::class, spl_object_id( $i_obj ), $rProperties, $i_nuPropertyCount );
+        $r = self::objectAsArray( $i_obj, $i_uDepth, $i_nuPropertyCount, $i_visited );
+        if ( 2 === count( $r ) ) {
+            return implode( '#', $r );
+        }
+        return $r;
     }
 
 
@@ -113,8 +198,7 @@ class LogTools {
      * @param list<mixed[]|object> $i_rAlreadySeen Objects that have already been printed. (Internal.)
      * @return string The formatted string representation of the array.
      */
-    private static function formatArrayInner( array $i_r, int $i_uIndent,
-                                              array &$i_rAlreadySeen = [] ) : string {
+    private static function formatArrayInner( array $i_r, int $i_uIndent, array &$i_rAlreadySeen = [] ) : string {
         $stIndent = str_repeat( ' ', $i_uIndent );
         $st = "{\n";
         foreach ( $i_r as $stKey => $xValue ) {
@@ -149,33 +233,24 @@ class LogTools {
     }
 
 
-    /** @param array<int|string, mixed> $i_rProperties */
-    private static function valueObjectProperties( string $i_stClass, ?int $i_nuID, array $i_rProperties,
-                                                   ?int   $i_nuPropertyCount ) : string {
-
-        $bTooMany = is_int( $i_nuPropertyCount ) && count( $i_rProperties ) > $i_nuPropertyCount;
-        if ( $bTooMany ) {
-            $i_rProperties = array_slice( $i_rProperties, 0, $i_nuPropertyCount );
-        }
-        $rOut = [];
-        $uCount = 0;
-        foreach ( $i_rProperties as $k => $v ) {
-            $rOut[] = "{$k}:{$v}";
-            if ( $bTooMany && ++$uCount >= $i_nuPropertyCount ) {
-                break;
-            }
-        }
-        if ( $bTooMany ) {
-            $rOut[] = '...';
-        }
-        $stProperties = implode( ', ', $rOut );
-        if ( is_int( $i_nuID ) ) {
-            $i_stClass .= "#{$i_nuID}";
-        }
-        if ( $stProperties ) {
-            $i_stClass .= "({$stProperties})";
-        }
-        return $i_stClass;
+    private static function valueInner( mixed $i_xValue, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5, ?VisitedCheck $i_visited = null ) : mixed {
+        return match ( true ) {
+            is_bool( $i_xValue ), is_float( $i_xValue ), is_int( $i_xValue ),
+            is_null( $i_xValue ), is_string( $i_xValue ) => $i_xValue,
+            is_array( $i_xValue ) => self::limitArray( $i_xValue, $i_uDepth, $i_nuPropertyCount, $i_visited ),
+            is_resource( $i_xValue ) => get_resource_type( $i_xValue ) . '(' . get_resource_id( $i_xValue ) . ')',
+            // @codeCoverageIgnoreStart
+            ! is_object( $i_xValue ) => gettype( $i_xValue ) . '(' . $i_xValue . ')',
+            // @codeCoverageIgnoreEnd
+            $i_xValue instanceof ContextSerializable =>
+            self::valueInner( $i_xValue->contextSerialize(), $i_uDepth, $i_nuPropertyCount, $i_visited ),
+            $i_xValue instanceof JsonSerializable => self::valueInner( $i_xValue->jsonSerialize(), $i_uDepth, $i_nuPropertyCount, $i_visited ),
+            $i_xValue instanceof Throwable => self::exceptionToArray( $i_xValue, $i_uDepth, max( 6, $i_nuPropertyCount ) ),
+            $i_xValue instanceof \BackedEnum => $i_xValue::class . '( ' . $i_xValue->name . ': ' . $i_xValue->value . ')',
+            $i_xValue instanceof \UnitEnum => $i_xValue::class . '( ' . $i_xValue->name . ')',
+            $i_xValue instanceof Stringable => $i_xValue::class . '(' . $i_xValue->__toString() . ')',
+            default => self::valueObject( $i_xValue, $i_uDepth, $i_nuPropertyCount, $i_visited ),
+        };
     }
 
 

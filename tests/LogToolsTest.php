@@ -10,6 +10,7 @@ namespace JDWX\Log\Tests;
 use Exception;
 use JDWX\Log\ContextSerializable;
 use JDWX\Log\LogTools;
+use JsonException;
 use JsonSerializable;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -30,6 +31,18 @@ final class LogToolsTest extends TestCase {
         self::assertStringContainsString( 'INNER_MESSAGE', $exArray[ 'previous' ][ 'message' ] );
         self::assertSame( 0, $exArray[ 'code' ] );
         self::assertSame( 1, $exArray[ 'previous' ][ 'code' ] );
+    }
+
+
+    public function testExceptionToArrayForTooDeep() : void {
+        $ex3 = new JsonException( 'foo', 0 );
+        $ex2 = new LogicException( 'foo', 1, $ex3 );
+        $ex = new RuntimeException( 'bar', 2, $ex2 );
+
+        $r = LogTools::exceptionToArray( $ex, 2 );
+        self::assertSame( 'RuntimeException', $r[ 'class' ] );
+        self::assertSame( 'LogicException', $r[ 'previous' ][ 'class' ] );
+        self::assertStringStartsWith( 'JsonException#', $r[ 'previous' ][ 'previous' ] );
     }
 
 
@@ -133,6 +146,29 @@ final class LogToolsTest extends TestCase {
     }
 
 
+    public function testLimitArrayForNoDepth() : void {
+        $r = LogTools::value( [ 1, 2, 3, 4, 5 ], 0 );
+        self::assertSame( [ '...' ], $r );
+    }
+
+
+    public function testLimitArrayForTooMany() : void {
+        $r = LogTools::value( [ 1, 2, 3, 4, 5 ], 2, 3 );
+        self::assertSame( [ 1, 2, 3, '...' ], $r );
+    }
+
+
+    public function testObjectAsArrayForNoDepth() : void {
+        $x = new stdClass();
+        $x->foo = 'bar';
+        $x->baz = 'qux';
+        $r = LogTools::objectAsArray( $x, 0 );
+        self::assertSame( 'stdClass', $r[ 'object$class' ] );
+        self::assertIsInt( $r[ 'object$id' ] );
+        self::assertCount( 2, $r );
+    }
+
+
     public function testValueForArray() : void {
         $r = [ 0 => 'foo', 1 => 'bar', 2 => true, 'baz' => 'qux' ];
         self::assertSame( $r, LogTools::value( $r ) );
@@ -145,6 +181,18 @@ final class LogToolsTest extends TestCase {
         self::assertSame( null, LogTools::value( null ) );
         self::assertSame( 12345, LogTools::value( 12345 ) );
         self::assertSame( 12345.6, LogTools::value( 12345.6 ) );
+    }
+
+
+    public function testValueForCircularReference() : void {
+        $x1 = new stdClass();
+        $x2 = new stdClass();
+        $x1->x2 = $x2;
+        $x2->x1 = $x1;
+        $r = LogTools::value( $x1 );
+        self::assertSame( 'stdClass', $r[ 'object$class' ] );
+        self::assertSame( 'stdClass', $r[ 'x2' ][ 'object$class' ] );
+        self::assertStringStartsWith( 'stdClass#', $r[ 'x2' ][ 'x1' ] );
     }
 
 
@@ -193,9 +241,37 @@ final class LogToolsTest extends TestCase {
     }
 
 
+    public function testValueForNestedObjects() : void {
+        $str = new class implements Stringable {
+
+
+            public function __toString() : string {
+                return 'bar';
+            }
+
+
+        };
+        $obj = new stdClass();
+        $obj->foo = $str;
+        $r = LogTools::value( $obj );
+        self::assertSame( 'stdClass', $r[ 'object$class' ] );
+        self::assertStringContainsString( 'Stringable@anonymous\0', $r[ 'foo' ] );
+        self::assertStringContainsString( '\0' . __FILE__, $r[ 'foo' ] );
+        self::assertStringContainsString( '(bar)', $r[ 'foo' ] );
+    }
+
+
     public function testValueForObject() : void {
         $st = LogTools::value( $this );
         self::assertSame( $this::class . '#' . spl_object_id( $this ), $st );
+    }
+
+
+    public function testValueForObjectNoDepth() : void {
+        $x = new stdClass();
+        $x->foo = 'bar';
+        $x->baz = 'qux';
+        self::assertStringStartsWith( 'stdClass#', LogTools::value( $x, 0 ) );
     }
 
 
@@ -214,10 +290,13 @@ final class LogToolsTest extends TestCase {
 
 
         };
-        $st = LogTools::value( $x, 2 );
-        self::assertStringContainsString( 'class@anonymous', $st );
-        self::assertStringContainsString( '\\0' . __FILE__ . ':', $st );
-        self::assertStringContainsString( '(foo:bar, baz:qux, ...)', $st );
+        $r = LogTools::value( $x, 3, 2 );
+        self::assertStringContainsString( 'class@anonymous', $r[ 'object$class' ] );
+        self::assertStringContainsString( '\\0' . __FILE__ . ':', $r[ 'object$class' ] );
+        self::assertSame( 'bar', $r[ 'foo' ] );
+        self::assertSame( 'qux', $r[ 'baz' ] );
+        self::assertContains( '...', $r );
+        self::assertCount( 5, $r );
     }
 
 
