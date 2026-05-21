@@ -62,7 +62,7 @@ class LogTools {
 
     /** @param array<string, mixed> $i_r */
     public static function formatArray( array $i_r ) : string {
-        return self::formatArrayInner( $i_r, 0 );
+        return self::formatArrayInner( self::value( $i_r ), 0 );
     }
 
 
@@ -161,7 +161,7 @@ class LogTools {
      * @return mixed The loggable value.
      *
      * Prepare an arbitrary value to be represented in a log context without
-     * converting it to a string. I.e., after running this, the returned value
+     * converting it to a string (if possible). I.e., after running this, the returned value
      * will be a scalar type, a string, or an array (possible nested) of scalar
      * types or strings. Objects that don't have a specific representation will
      * be returned as arrays of their properties with additional keys
@@ -194,29 +194,16 @@ class LogTools {
 
     /**
      * @param array<string, mixed> $i_r
-     * @param int                  $i_uIndent      The number of spaces to indent nested arrays. (Internal.)
-     * @param list<mixed[]|object> $i_rAlreadySeen Objects that have already been printed. (Internal.)
+     * @param int                  $i_uIndent The number of spaces to indent nested arrays.
      * @return string The formatted string representation of the array.
      */
-    private static function formatArrayInner( array $i_r, int $i_uIndent, array &$i_rAlreadySeen = [] ) : string {
+    private static function formatArrayInner( array $i_r, int $i_uIndent ) : string {
         $stIndent = str_repeat( ' ', $i_uIndent );
         $st = "{\n";
         foreach ( $i_r as $stKey => $xValue ) {
             $st .= "{$stIndent}  {$stKey}: ";
             if ( is_array( $xValue ) ) {
-                if ( in_array( $xValue, $i_rAlreadySeen, true ) ) {
-                    $st .= "array (already printed)\n";
-                } else {
-                    $i_rAlreadySeen[] = $xValue;
-                    $st .= 'array ' . self::formatArrayInner( $xValue, $i_uIndent + 2, $i_rAlreadySeen );
-                }
-            } elseif ( is_object( $xValue ) ) {
-                if ( in_array( $xValue, $i_rAlreadySeen, true ) ) {
-                    $st .= get_class( $xValue ) . " (already printed)\n";
-                } else {
-                    $i_rAlreadySeen[] = $xValue;
-                    $st .= get_class( $xValue ) . ' ' . self::formatArrayInner( (array) $xValue, $i_uIndent + 2, $i_rAlreadySeen );
-                }
+                $st .= 'array ' . self::formatArrayInner( $xValue, $i_uIndent + 2 );
             } elseif ( is_bool( $xValue ) ) {
                 $st .= $xValue ? 'true' : 'false';
                 $st .= "\n";
@@ -233,7 +220,16 @@ class LogTools {
     }
 
 
+    private static function valueContext( ContextSerializable $i_ctx, int $i_uDepth, ?int $i_nuPropertyCount, VisitedCheck $i_visited ) : mixed {
+        if ( ! $i_visited->visit( $i_ctx ) ) {
+            return $i_ctx::class . '#' . spl_object_id( $i_ctx );
+        }
+        return self::valueInner( $i_ctx->contextSerialize(), $i_uDepth, $i_nuPropertyCount, $i_visited );
+    }
+
+
     private static function valueInner( mixed $i_xValue, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5, ?VisitedCheck $i_visited = null ) : mixed {
+        $i_visited ??= new VisitedCheck();
         return match ( true ) {
             is_bool( $i_xValue ), is_float( $i_xValue ), is_int( $i_xValue ),
             is_null( $i_xValue ), is_string( $i_xValue ) => $i_xValue,
@@ -242,15 +238,22 @@ class LogTools {
             // @codeCoverageIgnoreStart
             ! is_object( $i_xValue ) => gettype( $i_xValue ) . '(' . $i_xValue . ')',
             // @codeCoverageIgnoreEnd
-            $i_xValue instanceof ContextSerializable =>
-            self::valueInner( $i_xValue->contextSerialize(), $i_uDepth, $i_nuPropertyCount, $i_visited ),
-            $i_xValue instanceof JsonSerializable => self::valueInner( $i_xValue->jsonSerialize(), $i_uDepth, $i_nuPropertyCount, $i_visited ),
+            $i_xValue instanceof ContextSerializable => self::valueContext( $i_xValue, $i_uDepth, $i_nuPropertyCount, $i_visited ),
+            $i_xValue instanceof JsonSerializable => self::valueJson( $i_xValue, $i_uDepth, $i_nuPropertyCount, $i_visited ),
             $i_xValue instanceof Throwable => self::exceptionToArray( $i_xValue, $i_uDepth, max( 6, $i_nuPropertyCount ) ),
             $i_xValue instanceof \BackedEnum => $i_xValue::class . '( ' . $i_xValue->name . ': ' . $i_xValue->value . ')',
             $i_xValue instanceof \UnitEnum => $i_xValue::class . '( ' . $i_xValue->name . ')',
             $i_xValue instanceof Stringable => $i_xValue::class . '(' . $i_xValue->__toString() . ')',
             default => self::valueObject( $i_xValue, $i_uDepth, $i_nuPropertyCount, $i_visited ),
         };
+    }
+
+
+    private static function valueJson( JsonSerializable $i_jso, int $i_uDepth, ?int $i_nuPropertyCount, VisitedCheck $i_visited ) : mixed {
+        if ( ! $i_visited->visit( $i_jso ) ) {
+            return $i_jso::class . '#' . spl_object_id( $i_jso );
+        }
+        return self::valueInner( $i_jso->jsonSerialize(), $i_uDepth, $i_nuPropertyCount, $i_visited );
     }
 
 

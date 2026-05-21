@@ -71,7 +71,7 @@ final class LogToolsTest extends TestCase {
         self::assertStringContainsString( 'bar', $result );
         self::assertStringContainsString( 'baz', $result );
         self::assertStringContainsString( 'qux', $result );
-        self::assertStringContainsString( 'already printed', $result );
+        self::assertStringContainsString( '...', $result );
     }
 
 
@@ -85,7 +85,7 @@ final class LogToolsTest extends TestCase {
         self::assertStringContainsString( 'bar', $result );
         self::assertStringContainsString( 'baz', $result );
         self::assertStringContainsString( 'qux', $result );
-        self::assertStringContainsString( 'already printed', $result );
+        self::assertStringContainsString( 'x: stdClass#', $result );
     }
 
 
@@ -117,7 +117,7 @@ final class LogToolsTest extends TestCase {
         self::assertStringContainsString( 'stdClass', $result );
         self::assertStringContainsString( 'foo', $result );
         self::assertStringContainsString( 'bar', $result );
-        self::assertStringContainsString( 'already printed', $result );
+        self::assertStringContainsString( 'x: stdClass#', $result );
     }
 
 
@@ -134,7 +134,7 @@ final class LogToolsTest extends TestCase {
         self::assertStringContainsString( 'bar', $result );
         self::assertStringContainsString( 'baz', $result );
         self::assertStringContainsString( 'qux', $result );
-        self::assertStringContainsString( 'already printed', $result );
+        self::assertStringContainsString( 'x: stdClass#', $result );
     }
 
 
