@@ -261,7 +261,7 @@ final class LogToolsTest extends TestCase {
             public ContextSerializable $foo;
 
 
-            /** @return array<string, object> */
+            /** @return array<string, mixed> */
             public function contextSerialize() : array {
                 return [ 'foo' => $this->foo ];
             }
@@ -275,7 +275,7 @@ final class LogToolsTest extends TestCase {
             public ContextSerializable $bar;
 
 
-            /** @return array<string, object> */
+            /** @return array<string, mixed> */
             public function contextSerialize() : array {
                 return [ 'bar' => $this->bar ];
             }
