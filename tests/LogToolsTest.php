@@ -178,6 +178,26 @@ final class LogToolsTest extends TestCase {
     }
 
 
+    public function testFormatForString() : void {
+        $x = 'foo';
+        self::assertSame( '"foo"', LogTools::format( $x ) );
+    }
+
+
+    public function testFormatForStringable() : void {
+        $x = new class implements Stringable {
+
+
+            public function __toString() : string {
+                return 'stringable';
+            }
+
+
+        };
+        self::assertSame( '"stringable"', LogTools::format( $x ) );
+    }
+
+
     public function testFormatObject() : void {
         $x = new stdClass();
         $x->foo = 'bar';
@@ -190,6 +210,12 @@ final class LogToolsTest extends TestCase {
         self::assertStringContainsString( 'baz: array', $st );
         self::assertStringContainsString( 'quux: "corge"', $st );
         self::assertStringContainsString( '1: "qux"', $st );
+    }
+
+
+    public function testFormatObjectForEmpty() : void {
+        $x = new stdClass();
+        self::assertSame( 'stdClass#' . spl_object_id( $x ), LogTools::formatObject( $x ) );
     }
 
 

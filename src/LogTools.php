@@ -87,8 +87,12 @@ class LogTools {
 
 
     public static function formatObject( object $i_obj, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5 ) : string {
-        return $i_obj::class . '#' . spl_object_id( $i_obj ) . ' '
-            . self::formatArrayInner( self::escape( self::objectProperties( $i_obj, $i_uDepth, $i_nuPropertyCount ) ), 0 );
+        $st = $i_obj::class . '#' . spl_object_id( $i_obj );
+        $r = self::objectProperties( $i_obj, $i_uDepth, $i_nuPropertyCount );
+        if ( count( $r ) > 0 ) {
+            $st .= ' ' . self::formatArrayInner( self::escape( $r ), 0 );
+        }
+        return $st;
     }
 
 
