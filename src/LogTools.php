@@ -67,6 +67,12 @@ class LogTools {
         if ( is_array( $i_x ) ) {
             return self::formatArray( $i_x );
         }
+        if ( is_null( $i_x ) ) {
+            return 'null';
+        }
+        if ( is_bool( $i_x ) ) {
+            return $i_x ? 'true' : 'false';
+        }
         return strval( self::value( $i_x ) );
     }
 

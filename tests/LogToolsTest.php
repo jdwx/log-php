@@ -147,8 +147,19 @@ final class LogToolsTest extends TestCase {
     }
 
 
+    public function testFormatForBool() : void {
+        self::assertSame( 'true', LogTools::format( true ) );
+        self::assertSame( 'false', LogTools::format( false ) );
+    }
+
+
     public function testFormatForInt() : void {
         self::assertSame( '1', LogTools::format( 1 ) );
+    }
+
+
+    public function testFormatForNull() : void {
+        self::assertSame( 'null', LogTools::format( null ) );
     }
 
 
