@@ -60,9 +60,26 @@ class LogTools {
     }
 
 
+    public static function format( mixed $i_x ) : string {
+        if ( is_object( $i_x ) ) {
+            return self::formatObject( $i_x );
+        }
+        if ( is_array( $i_x ) ) {
+            return self::formatArray( $i_x );
+        }
+        return strval( self::value( $i_x ) );
+    }
+
+
     /** @param array<string, mixed> $i_r */
-    public static function formatArray( array $i_r ) : string {
+    public static function formatArray( array|object $i_r ) : string {
         return self::formatArrayInner( self::value( $i_r ), 0 );
+    }
+
+
+    public static function formatObject( object $i_obj ) : string {
+        return $i_obj::class . '#' . spl_object_id( $i_obj ) . ' '
+            . self::formatArrayInner( self::escape( self::objectProperties( $i_obj ) ), 0 );
     }
 
 

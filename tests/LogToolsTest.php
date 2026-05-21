@@ -138,6 +138,50 @@ final class LogToolsTest extends TestCase {
     }
 
 
+    public function testFormatForArray() : void {
+        $r = [ 'foo' => 'bar' ];
+        $st = LogTools::format( $r );
+        self::assertStringStartsWith( '{', $st );
+        self::assertStringContainsString( 'foo: bar', $st );
+        self::assertStringEndsWith( "}\n", $st );
+    }
+
+
+    public function testFormatForInt() : void {
+        self::assertSame( '1', LogTools::format( 1 ) );
+    }
+
+
+    public function testFormatForObject() : void {
+        $x = new stdClass();
+        $x->foo = 'bar';
+        $st = LogTools::format( $x );
+        self::assertStringStartsWith( 'stdClass#', $st );
+        self::assertStringContainsString( 'foo: bar', $st );
+    }
+
+
+    public function testFormatForResource() : void {
+        $f = fopen( 'php://memory', 'r+' );
+        self::assertStringStartsWith( 'stream(', LogTools::format( $f ) );
+    }
+
+
+    public function testFormatObject() : void {
+        $x = new stdClass();
+        $x->foo = 'bar';
+        $x->baz = [ new stdClass(), 'qux' ];
+        $x->baz[ 0 ]->quux = 'corge';
+        $st = LogTools::formatObject( $x );
+        self::assertStringStartsWith( 'stdClass#', $st );
+        self::assertStringContainsString( 'foo: bar', $st );
+        self::assertStringContainsString( 'object$class: stdClass', $st );
+        self::assertStringContainsString( 'baz: array', $st );
+        self::assertStringContainsString( 'quux: corge', $st );
+        self::assertStringContainsString( '1: qux', $st );
+    }
+
+
     public function testInterpolate() : void {
         self::assertSame( 'Test {y}', LogTools::interpolate( 'Test {y}', [ 'x' => 123 ] ) );
         self::assertSame( 'Test', LogTools::interpolate( 'Test', [] ) );
@@ -210,6 +254,42 @@ final class LogToolsTest extends TestCase {
     }
 
 
+    public function testValueForContextSerializableNested() : void {
+        $foo = new class implements ContextSerializable {
+
+
+            public ContextSerializable $foo;
+
+
+            /** @return array<string, object> */
+            public function contextSerialize() : array {
+                return [ 'foo' => $this->foo ];
+            }
+
+
+        };
+
+        $bar = new class implements ContextSerializable {
+
+
+            public ContextSerializable $bar;
+
+
+            /** @return array<string, object> */
+            public function contextSerialize() : array {
+                return [ 'bar' => $this->bar ];
+            }
+
+
+        };
+        $foo->foo = $bar;
+        $bar->bar = $foo;
+        $r = LogTools::value( $foo );
+        self::assertStringStartsWith( 'JDWX\\Log\\ContextSerializable@anonymous\\0', $r[ 'foo' ][ 'bar' ] );
+        self::assertStringContainsString( '\\0' . __FILE__, $r[ 'foo' ][ 'bar' ] );
+    }
+
+
     public function testValueForException() : void {
         $ex = new Exception( 'Test exception', 12345 );
         $rCheck = [
@@ -238,6 +318,45 @@ final class LogToolsTest extends TestCase {
 
         };
         self::assertSame( 'test', LogTools::value( $jso ) );
+    }
+
+
+    public function testValueForJsonSerializableNested() : void {
+        $foo = new class implements JsonSerializable {
+
+
+            public JsonSerializable $foo;
+
+
+            /** @return array<string, object> */
+            public function jsonSerialize() : array {
+                return [ 'foo' => $this->foo ];
+            }
+
+
+        };
+
+        $bar = new class implements JsonSerializable {
+
+
+            public JsonSerializable $bar;
+
+
+            /** @return array<string, object> */
+            public function jsonSerialize() : array {
+                return [ 'bar' => $this->bar ];
+            }
+
+
+        };
+
+        $foo->foo = $bar;
+        $bar->bar = $foo;
+
+        $r = LogTools::value( $foo );
+        self::assertStringStartsWith( 'JsonSerializable@anonymous\\0', $r[ 'foo' ][ 'bar' ] );
+        self::assertStringContainsString( '\\0' . __FILE__, $r[ 'foo' ][ 'bar' ] );
+
     }
 
 
