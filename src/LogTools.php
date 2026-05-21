@@ -60,12 +60,12 @@ class LogTools {
     }
 
 
-    public static function format( mixed $i_x ) : string {
+    public static function format( mixed $i_x, int $i_uDepth = 3, ?int $i_nuPropertyCount = 6 ) : string {
         if ( is_object( $i_x ) ) {
-            return self::formatObject( $i_x );
+            return self::formatObject( $i_x, $i_uDepth, $i_nuPropertyCount );
         }
         if ( is_array( $i_x ) ) {
-            return self::formatArray( $i_x );
+            return self::formatArray( $i_x, $i_uDepth, $i_nuPropertyCount );
         }
         if ( is_null( $i_x ) ) {
             return 'null';
@@ -73,19 +73,19 @@ class LogTools {
         if ( is_bool( $i_x ) ) {
             return $i_x ? 'true' : 'false';
         }
-        return strval( self::value( $i_x ) );
+        return strval( self::value( $i_x, $i_uDepth, $i_nuPropertyCount ) );
     }
 
 
     /** @param array<string, mixed> $i_r */
-    public static function formatArray( array|object $i_r ) : string {
-        return self::formatArrayInner( self::value( $i_r ), 0 );
+    public static function formatArray( array|object $i_r, int $i_uDepth = 3, ?int $i_nuPropertyCount = 6 ) : string {
+        return self::formatArrayInner( self::value( $i_r, $i_uDepth, $i_nuPropertyCount ), 0 );
     }
 
 
-    public static function formatObject( object $i_obj ) : string {
+    public static function formatObject( object $i_obj, int $i_uDepth = 3, ?int $i_nuPropertyCount = 6 ) : string {
         return $i_obj::class . '#' . spl_object_id( $i_obj ) . ' '
-            . self::formatArrayInner( self::escape( self::objectProperties( $i_obj ) ), 0 );
+            . self::formatArrayInner( self::escape( self::objectProperties( $i_obj, $i_uDepth, $i_nuPropertyCount ) ), 0 );
     }
 
 
