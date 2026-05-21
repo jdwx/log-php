@@ -74,7 +74,7 @@ final class FormattedLoggerTest extends TestCase {
     public function testRenderContext() : void {
         $logger = new MyFormattedLogger();
         $result = $logger->renderContext( [ 'exception' => new Exception( 'Test exception' ) ] );
-        self::assertStringContainsString( 'class: Exception', $result );
+        self::assertStringContainsString( 'class: "Exception"', $result );
     }
 
 

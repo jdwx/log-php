@@ -61,6 +61,9 @@ class LogTools {
 
 
     public static function format( mixed $i_x, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5 ) : string {
+        if ( is_string( $i_x ) || $i_x instanceof Stringable ) {
+            return '"' . str_replace( '"', '\\"', strval( $i_x ) ) . '"';
+        }
         if ( is_object( $i_x ) ) {
             return self::formatObject( $i_x, $i_uDepth, $i_nuPropertyCount );
         }
@@ -232,6 +235,9 @@ class LogTools {
                 $st .= "\n";
             } elseif ( is_null( $xValue ) ) {
                 $st .= 'null';
+                $st .= "\n";
+            } elseif ( is_string( $xValue ) ) {
+                $st .= '"' . str_replace( '"', '\\"', $xValue ) . '"';
                 $st .= "\n";
             } else {
                 $st .= $xValue;

@@ -54,8 +54,8 @@ final class LogToolsTest extends TestCase {
             'qux' => false,
             'quux' => null,
         ] );
-        self::assertStringContainsString( 'message: TEST_MESSAGE', $result );
-        self::assertStringContainsString( 'foo: bar', $result );
+        self::assertStringContainsString( 'message: "TEST_MESSAGE"', $result );
+        self::assertStringContainsString( 'foo: "bar"', $result );
         self::assertStringContainsString( 'baz: true', $result );
         self::assertStringContainsString( 'qux: false', $result );
         self::assertStringContainsString( 'quux: null', $result );
@@ -85,7 +85,7 @@ final class LogToolsTest extends TestCase {
         self::assertStringContainsString( 'bar', $result );
         self::assertStringContainsString( 'baz', $result );
         self::assertStringContainsString( 'qux', $result );
-        self::assertStringContainsString( 'x: stdClass#', $result );
+        self::assertStringContainsString( 'x: "stdClass#', $result );
     }
 
 
@@ -116,8 +116,8 @@ final class LogToolsTest extends TestCase {
         $result = LogTools::formatArray( $r );
         self::assertStringContainsString( 'stdClass', $result );
         self::assertStringContainsString( 'foo', $result );
-        self::assertStringContainsString( 'bar', $result );
-        self::assertStringContainsString( 'x: stdClass#', $result );
+        self::assertStringContainsString( '"bar"', $result );
+        self::assertStringContainsString( 'x: "stdClass#', $result );
     }
 
 
@@ -131,10 +131,10 @@ final class LogToolsTest extends TestCase {
         $result = LogTools::formatArray( [ 'x' => $x ] );
         self::assertStringContainsString( 'stdClass', $result );
         self::assertStringContainsString( 'foo', $result );
-        self::assertStringContainsString( 'bar', $result );
+        self::assertStringContainsString( '"bar"', $result );
         self::assertStringContainsString( 'baz', $result );
-        self::assertStringContainsString( 'qux', $result );
-        self::assertStringContainsString( 'x: stdClass#', $result );
+        self::assertStringContainsString( '"qux"', $result );
+        self::assertStringContainsString( 'x: "stdClass#', $result );
     }
 
 
@@ -142,7 +142,7 @@ final class LogToolsTest extends TestCase {
         $r = [ 'foo' => 'bar' ];
         $st = LogTools::format( $r );
         self::assertStringStartsWith( '{', $st );
-        self::assertStringContainsString( 'foo: bar', $st );
+        self::assertStringContainsString( 'foo: "bar"', $st );
         self::assertStringEndsWith( "}\n", $st );
     }
 
@@ -168,7 +168,7 @@ final class LogToolsTest extends TestCase {
         $x->foo = 'bar';
         $st = LogTools::format( $x );
         self::assertStringStartsWith( 'stdClass#', $st );
-        self::assertStringContainsString( 'foo: bar', $st );
+        self::assertStringContainsString( 'foo: "bar"', $st );
     }
 
 
@@ -185,11 +185,11 @@ final class LogToolsTest extends TestCase {
         $x->baz[ 0 ]->quux = 'corge';
         $st = LogTools::formatObject( $x );
         self::assertStringStartsWith( 'stdClass#', $st );
-        self::assertStringContainsString( 'foo: bar', $st );
-        self::assertStringContainsString( 'object$class: stdClass', $st );
+        self::assertStringContainsString( 'foo: "bar"', $st );
+        self::assertStringContainsString( 'object$class: "stdClass"', $st );
         self::assertStringContainsString( 'baz: array', $st );
-        self::assertStringContainsString( 'quux: corge', $st );
-        self::assertStringContainsString( '1: qux', $st );
+        self::assertStringContainsString( 'quux: "corge"', $st );
+        self::assertStringContainsString( '1: "qux"', $st );
     }
 
 
