@@ -36,6 +36,7 @@ class BufferLogger extends AbstractDirectLogger implements Countable {
      * Does not validate $level because this is mainly used for capturing actual values in testing.
      */
     public function log( mixed $level, string|Stringable $message, array $context = [] ) : void {
+        $context = $this->mergeGlobalContext( $context );
         $this->rLogs[] = new LogEntry( $level, $message, $context );
     }
 

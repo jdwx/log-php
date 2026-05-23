@@ -20,7 +20,9 @@ use Psr\Log\LoggerInterface as PsrLoggerInterface;
 class ProxyLogger extends AbstractProxyLogger {
 
 
-    public function __construct( private ?PsrLoggerInterface $logger = null ) {}
+    public function __construct( private ?PsrLoggerInterface $logger = null, ?GlobalContext $gtx = null ) {
+        parent::__construct( $gtx );
+    }
 
 
     public function getLogger() : ?PsrLoggerInterface {

@@ -10,6 +10,7 @@ namespace JDWX\Log\Tests;
 use JDWX\Log\AbstractDirectLogger;
 use JDWX\Log\AbstractProxyLogger;
 use JDWX\Log\BufferLogger;
+use JDWX\Log\GlobalContext;
 use JDWX\Log\ProxyLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -43,6 +44,16 @@ final class ProxyLoggerTest extends TestCase {
         $proxy->setLogger( $logger );
         $proxy->flushLog();
         self::assertTrue( $logger->bFlushed );
+    }
+
+
+    public function testGetGlobalContext() : void {
+        $log = new ProxyLogger();
+        self::assertNull( $log->getGlobalContext() );
+
+        $gtx = new GlobalContext();
+        $log = new ProxyLogger( gtx: $gtx );
+        self::assertSame( $gtx, $log->getGlobalContext() );
     }
 
 

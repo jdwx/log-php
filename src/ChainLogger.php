@@ -20,6 +20,7 @@ class ChainLogger extends AbstractDirectLogger {
 
     /** @param list<PsrLoggerInterface>|PsrLoggerInterface ...$i_loggers */
     public function __construct( array|PsrLoggerInterface ...$i_loggers ) {
+        parent::__construct();
         foreach ( $i_loggers as $logger ) {
             $this->push( $logger );
         }

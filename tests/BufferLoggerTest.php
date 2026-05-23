@@ -10,6 +10,7 @@ namespace JDWX\Log\Tests;
 use Exception;
 use JDWX\Log\AbstractDirectLogger;
 use JDWX\Log\BufferLogger;
+use JDWX\Log\GlobalContext;
 use JDWX\Log\LogEntry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -215,6 +216,25 @@ final class BufferLoggerTest extends TestCase {
     public function testGetLogger() : void {
         $buf = new BufferLogger();
         self::assertSame( $buf, $buf->getLogger() );
+    }
+
+
+    public function testGlobalContext() : void {
+        $gtx = new GlobalContext();
+        $buf = new BufferLogger( $gtx );
+        self::assertSame( $gtx, $buf->getGlobalContext() );
+
+        $gtx[ 'foo' ] = 'bar';
+        $gtx[ 'qux' ] = 'quux';
+        $buf->log( LogLevel::DEBUG, 'baz', [ 'qux' => 'corge', 'grault' => 'garply' ] );
+
+        $log = $buf->shiftLogEx();
+        self::assertSame( LogLevel::DEBUG, $log->level );
+        self::assertSame( 'baz', $log->message );
+        self::assertSame( 'bar', $log->context[ 'foo' ] );
+        self::assertSame( 'corge', $log->context[ 'qux' ] );
+        self::assertSame( 'garply', $log->context[ 'grault' ] );
+
     }
 
 

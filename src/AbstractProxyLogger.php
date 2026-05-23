@@ -18,11 +18,19 @@ abstract class AbstractProxyLogger extends AbstractLogger implements HasLoggerIn
     use LoggerExtraTrait;
 
 
+    public function __construct( private readonly ?GlobalContext $gtx = null ) {}
+
+
     public function flushLog() : void {
         $logger = $this->getLogger();
         if ( $logger instanceof LoggerInterface ) {
             $logger->flushLog();
         }
+    }
+
+
+    public function getGlobalContext() : ?GlobalContext {
+        return $this->gtx;
     }
 
 

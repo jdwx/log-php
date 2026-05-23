@@ -25,7 +25,7 @@ class BufferBatchLogger extends AbstractBatchLogger {
     protected function batch( string $i_stLevel, array $i_rLogMessages, array $i_rCommonContext ) : void {
         $this->rLastBatch = $i_rLogMessages;
         $this->stLastLevel = $i_stLevel;
-        $this->rCommonContext = $i_rCommonContext;
+        $this->rCommonContext = $this->mergeGlobalContext( $i_rCommonContext );
     }
 
 

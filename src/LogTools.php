@@ -80,7 +80,7 @@ class LogTools {
     }
 
 
-    /** @param array<string, mixed> $i_r */
+    /** @param array<int|string, mixed> $i_r */
     public static function formatArray( array|object $i_r, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5 ) : string {
         return self::formatArrayInner( self::value( $i_r, $i_uDepth, $i_nuPropertyCount ), 0 );
     }

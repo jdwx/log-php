@@ -36,6 +36,7 @@ abstract class AbstractFormattedLogger extends AbstractDirectLogger {
 
     /** @param mixed[] $context */
     public function renderContext( array $context ) : string {
+        $context = $this->mergeGlobalContext( $context );
         if ( empty( $context ) ) {
             return '';
         }
