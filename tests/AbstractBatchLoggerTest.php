@@ -288,4 +288,22 @@ final class AbstractBatchLoggerTest extends TestCase {
     }
 
 
+    public function testLogPreservesPerEntryContextWhenContextExceedsValueLimit() : void {
+        $bbl = new BufferBatchLogger();
+        $rCommon = [
+            'host' => 'brick.home.wheelhouse.org',
+            'pid' => 1383,
+            'type' => 'members-dev',
+            'env' => 'dev',
+            '_msg' => 'GET /jdw/accounts/C7E6-49521B0A',
+        ];
+        $bbl->log( LogLevel::WARNING, 'first', $rCommon + [ 'route' => 'inner' ] );
+        $bbl->log( LogLevel::DEBUG, 'second', $rCommon + [ 'status' => 200 ] );
+        $bbl->flushLog();
+        self::assertSame( $rCommon, $bbl->rCommonContext );
+        self::assertSame( [ 'route' => 'inner' ], $bbl->rLastBatch[ 0 ]->context );
+        self::assertSame( [ 'status' => 200 ], $bbl->rLastBatch[ 1 ]->context );
+    }
+
+
 }

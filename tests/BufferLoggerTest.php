@@ -11,7 +11,6 @@ use Exception;
 use JDWX\Log\AbstractDirectLogger;
 use JDWX\Log\BufferLogger;
 use JDWX\Log\LogEntry;
-use JDWX\Log\LoggerExtraTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
@@ -20,7 +19,6 @@ use RuntimeException;
 
 #[CoversClass( AbstractDirectLogger::class )]
 #[CoversClass( BufferLogger::class )]
-#[CoversClass( LoggerExtraTrait::class )]
 final class BufferLoggerTest extends TestCase {
 
 
