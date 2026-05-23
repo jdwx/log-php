@@ -11,8 +11,9 @@ class ContextDecoratorLogger extends AbstractContextDecoratorLogger {
 
 
     /** @param array<int|string, mixed> $rExtraContext */
-    public function __construct( \Psr\Log\LoggerInterface $i_logger, private array $rExtraContext = [] ) {
-        parent::__construct( $i_logger );
+    public function __construct( \Psr\Log\LoggerInterface $logger, private array $rExtraContext = [],
+                                 ?GlobalContext           $gtx = null ) {
+        parent::__construct( $logger, $gtx );
     }
 
 
