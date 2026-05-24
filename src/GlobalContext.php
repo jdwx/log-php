@@ -18,9 +18,15 @@ class GlobalContext implements \ArrayAccess, \JsonSerializable {
     private array $rContext = [];
 
 
+    public function __construct() {
+        $this->setDepth( PHP_INT_MAX );
+        $this->setPropertyCount( PHP_INT_MAX );
+    }
+
+
     /** @return array<int|string, mixed> */
     public function jsonSerialize() : array {
-        return $this->value( $this->rContext, PHP_INT_MAX, null );
+        return $this->value( $this->rContext );
     }
 
 
