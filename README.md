@@ -2,9 +2,9 @@
 
 A simple PHP module for logging.
 
-This provides some commonly-used logging functionality, like being able to relay LoggerInterface functionality between objects.
+This provides some common logging functionality, like being able to relay LoggerInterface functionality between objects.
 
-This is not and is not intended to be anything like a full-featured logging framework like (the excellent) Monolog. It mostly gets used to provide a default logging option for other libraries, and for catching and checking log messages during testing.
+This is not and is not intended to be anything like a full-featured logging framework like (the excellent) Monolog. It mostly gets used to provide a default logging option for other libraries and for catching and checking log messages during testing.
 
 ## Installation
 
@@ -18,7 +18,7 @@ Or download the source from GitHub: https://github.com/jdwx/log-php.git
 
 ## Requirements
 
-This module requires PHP 8.2 or later.
+This module requires PHP 8.3 or later.
 
 ## Usage
 
@@ -46,7 +46,7 @@ $x = new MyClass();
 $x->info( 'Hello, world!' );
 ```
 
-There are many unit tests for this module which provide additional examples of usage.
+There are many unit tests for this module that provide additional examples of usage.
 
 ## Stability
 
