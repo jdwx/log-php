@@ -17,8 +17,9 @@ readonly class TimestampedLogEntry extends LogEntry implements ContextSerializab
     public float $fTimestampMicro;
 
 
-    public function __construct( int|string $i_level, string|Stringable $i_stMessage, array $i_rContext ) {
-        parent::__construct( $i_level, $i_stMessage, $i_rContext );
+    public function __construct( int|string     $i_level, string|Stringable $i_stMessage, array $i_rContext = [],
+                                 ?GlobalContext $i_gtx = null ) {
+        parent::__construct( $i_level, $i_stMessage, $i_rContext, $i_gtx );
         $this->fTimestampMicro = microtime( true );
     }
 

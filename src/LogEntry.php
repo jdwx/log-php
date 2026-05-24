@@ -26,9 +26,9 @@ readonly class LogEntry implements Stringable, LogEntryInterface, JsonSerializab
 
 
     /** @param mixed[] $i_rContext */
-    public function __construct( int|string     $i_level, string|Stringable $i_stMessage, array $i_rContext,
-                                 ?GlobalContext $gtx = null ) {
-        $this->fromGlobalContext( $gtx );
+    public function __construct( int|string             $i_level, string|Stringable $i_stMessage, array $i_rContext,
+                                 private ?GlobalContext $gtx = null ) {
+        $this->fromGlobalContext( $this->gtx );
         $this->level = LogLevels::toString( $i_level ) ?? "INVALID({$i_level})";
         $this->message = strval( $i_stMessage );
         $this->context = $i_rContext;
@@ -73,7 +73,7 @@ readonly class LogEntry implements Stringable, LogEntryInterface, JsonSerializab
 
     /** @param array<int|string, mixed> $i_rContext */
     public function withContext( array $i_rContext ) : self {
-        return new self( $this->level, $this->message, $i_rContext );
+        return new self( $this->level, $this->message, $i_rContext, $this->gtx );
     }
 
 
