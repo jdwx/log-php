@@ -15,6 +15,11 @@ use Throwable;
 class LogTools {
 
 
+    public const int DEFAULT_DEPTH          = 3;
+
+    public const int DEFAULT_PROPERTY_COUNT = 6;
+
+
     public static function escape( mixed $i_x ) : mixed {
         return match ( true ) {
             is_string( $i_x ) => str_replace( [ "\t", "\n", "\r", chr( 0 ) ], [ '\\t', '\\n', '\\r', '\\0' ], $i_x ),
@@ -38,7 +43,8 @@ class LogTools {
 
 
     /** @return array<string, mixed> */
-    public static function exceptionToArray( Throwable $x, int $i_uDepth = 3, int $i_uPropertyCount = 6, ?VisitedCheck $i_visited = null ) : array {
+    public static function exceptionToArray( Throwable $x, int $i_uDepth = self::DEFAULT_DEPTH,
+                                             int       $i_uPropertyCount = 6, ?VisitedCheck $i_visited = null ) : array {
         $i_visited ??= new VisitedCheck();
         $r = [
             'class' => $x::class,
@@ -60,7 +66,8 @@ class LogTools {
     }
 
 
-    public static function format( mixed $i_x, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5 ) : string {
+    public static function format( mixed $i_x, int $i_uDepth = self::DEFAULT_DEPTH,
+                                   ?int  $i_nuPropertyCount = self::DEFAULT_PROPERTY_COUNT ) : string {
         if ( is_string( $i_x ) || $i_x instanceof Stringable ) {
             return '"' . str_replace( '"', '\\"', strval( $i_x ) ) . '"';
         }
@@ -81,12 +88,14 @@ class LogTools {
 
 
     /** @param array<int|string, mixed> $i_r */
-    public static function formatArray( array|object $i_r, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5 ) : string {
+    public static function formatArray( array|object $i_r, int $i_uDepth = self::DEFAULT_DEPTH,
+                                        ?int         $i_nuPropertyCount = self::DEFAULT_PROPERTY_COUNT ) : string {
         return self::formatArrayInner( self::value( $i_r, $i_uDepth, $i_nuPropertyCount ), 0 );
     }
 
 
-    public static function formatObject( object $i_obj, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5 ) : string {
+    public static function formatObject( object $i_obj, int $i_uDepth = self::DEFAULT_DEPTH,
+                                         ?int   $i_nuPropertyCount = self::DEFAULT_PROPERTY_COUNT ) : string {
         $st = $i_obj::class . '#' . spl_object_id( $i_obj );
         $r = self::objectProperties( $i_obj, $i_uDepth, $i_nuPropertyCount );
         if ( count( $r ) > 0 ) {
@@ -128,8 +137,8 @@ class LogTools {
      * Used to limit arrays to a specified number of (loggable) values, considering both depth and number of elements.
      * This is used to prevent spewing pages and pages of large objects into logs.
      */
-    public static function limitArray( array         $i_rValues, int $i_uDepth = 3, ?int $i_nuMaxValues = 5,
-                                       ?VisitedCheck $i_visited = null ) : array {
+    public static function limitArray( array $i_rValues, int $i_uDepth = self::DEFAULT_DEPTH,
+                                       ?int  $i_nuMaxValues = 5, ?VisitedCheck $i_visited = null ) : array {
         if ( $i_uDepth < 1 ) {
             $i_nuMaxValues = 0;
         }
@@ -157,7 +166,9 @@ class LogTools {
      * @param VisitedCheck|null $i_visited
      * @return array<int|string, mixed> Object as array with class name and id as elements of the array.
      */
-    public static function objectAsArray( object $i_obj, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5, ?VisitedCheck $i_visited = null ) : array {
+    public static function objectAsArray( object        $i_obj, int $i_uDepth = self::DEFAULT_DEPTH,
+                                          ?int          $i_nuPropertyCount = self::DEFAULT_PROPERTY_COUNT,
+                                          ?VisitedCheck $i_visited = null ) : array {
         $r = [
             'object$class' => $i_obj::class,
             'object$id' => spl_object_id( $i_obj ),
@@ -178,7 +189,9 @@ class LogTools {
      *
      * Gets (loggable) properties of an object, optionally limiting depth and number of properties.
      */
-    public static function objectProperties( object $i_obj, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5, ?VisitedCheck $i_visited = null ) : array {
+    public static function objectProperties( object        $i_obj, int $i_uDepth = self::DEFAULT_DEPTH,
+                                             ?int          $i_nuPropertyCount = self::DEFAULT_PROPERTY_COUNT,
+                                             ?VisitedCheck $i_visited = null ) : array {
         $rProperties = method_exists( $i_obj, '__debugInfo' )
             ? $i_obj->__debugInfo()
             : get_object_vars( $i_obj );
@@ -197,7 +210,8 @@ class LogTools {
      * be returned as arrays of their properties with additional keys
      * object$class and object$id.
      */
-    public static function value( mixed $i_xValue, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5 ) : mixed {
+    public static function value( mixed $i_xValue, int $i_uDepth = self::DEFAULT_DEPTH,
+                                  ?int  $i_nuPropertyCount = self::DEFAULT_PROPERTY_COUNT ) : mixed {
         return self::escape( self::valueInner( $i_xValue, $i_uDepth, $i_nuPropertyCount ) );
     }
 
@@ -209,7 +223,9 @@ class LogTools {
      * @param ?VisitedCheck $i_visited List of classes that have already been seen.
      * @return array<int|string, mixed>|string
      */
-    public static function valueObject( object $i_obj, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5, ?VisitedCheck $i_visited = null ) : array|string {
+    public static function valueObject( object        $i_obj, int $i_uDepth = self::DEFAULT_DEPTH,
+                                        ?int          $i_nuPropertyCount = self::DEFAULT_PROPERTY_COUNT,
+                                        ?VisitedCheck $i_visited = null ) : array|string {
         $i_visited ??= new VisitedCheck();
         if ( ! $i_visited->visit( $i_obj ) ) {
             $i_uDepth = 0;
@@ -253,7 +269,8 @@ class LogTools {
     }
 
 
-    private static function valueContext( ContextSerializable $i_ctx, int $i_uDepth, ?int $i_nuPropertyCount, VisitedCheck $i_visited ) : mixed {
+    private static function valueContext( ContextSerializable $i_ctx, int $i_uDepth, ?int $i_nuPropertyCount,
+                                          VisitedCheck        $i_visited ) : mixed {
         if ( ! $i_visited->visit( $i_ctx ) ) {
             return $i_ctx::class . '#' . spl_object_id( $i_ctx );
         }
@@ -261,7 +278,9 @@ class LogTools {
     }
 
 
-    private static function valueInner( mixed $i_xValue, int $i_uDepth = 3, ?int $i_nuPropertyCount = 5, ?VisitedCheck $i_visited = null ) : mixed {
+    private static function valueInner( mixed         $i_xValue, int $i_uDepth = self::DEFAULT_DEPTH,
+                                        ?int          $i_nuPropertyCount = self::DEFAULT_PROPERTY_COUNT,
+                                        ?VisitedCheck $i_visited = null ) : mixed {
         $i_visited ??= new VisitedCheck();
         return match ( true ) {
             is_bool( $i_xValue ), is_float( $i_xValue ), is_int( $i_xValue ),
@@ -282,7 +301,8 @@ class LogTools {
     }
 
 
-    private static function valueJson( JsonSerializable $i_jso, int $i_uDepth, ?int $i_nuPropertyCount, VisitedCheck $i_visited ) : mixed {
+    private static function valueJson( JsonSerializable $i_jso, int $i_uDepth, ?int $i_nuPropertyCount,
+                                       VisitedCheck     $i_visited ) : mixed {
         if ( ! $i_visited->visit( $i_jso ) ) {
             return $i_jso::class . '#' . spl_object_id( $i_jso );
         }

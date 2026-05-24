@@ -11,13 +11,16 @@ namespace JDWX\Log;
 class GlobalContext implements \ArrayAccess, \JsonSerializable {
 
 
+    use ValueTrait;
+
+
     /** @var array<int|string, mixed> */
     private array $rContext = [];
 
 
     /** @return array<int|string, mixed> */
     public function jsonSerialize() : array {
-        return LogTools::value( $this->rContext, PHP_INT_MAX, null );
+        return $this->value( $this->rContext, PHP_INT_MAX, null );
     }
 
 

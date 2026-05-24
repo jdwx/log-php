@@ -98,11 +98,11 @@ abstract class AbstractBatchLogger extends AbstractDirectLogger {
 
         $rNewEntries = [];
         foreach ( $this->rEntries as $entry ) {
-            $rNewEntries[] = $entry->withContext( LogTools::value( array_diff_key( $entry->context(), $rCommonContext ) ) );
+            $rNewEntries[] = $entry->withContext( $this->value( array_diff_key( $entry->context(), $rCommonContext ) ) );
         }
 
         $this->rEntries = $rNewEntries;
-        $this->rCommonContext = LogTools::value( $rCommonContext );
+        $this->rCommonContext = $this->value( $rCommonContext );
 
     }
 

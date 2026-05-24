@@ -12,6 +12,8 @@ abstract class AbstractDirectLogger implements HasLoggerInterface, LoggerInterfa
 
     use LoggerTrait;
 
+    use ValueTrait;
+
 
     public function __construct( private readonly ?GlobalContext $gtx = null ) {}
 
