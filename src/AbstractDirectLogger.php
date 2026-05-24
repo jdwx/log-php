@@ -15,7 +15,12 @@ abstract class AbstractDirectLogger implements HasLoggerInterface, LoggerInterfa
     use ValueTrait;
 
 
-    public function __construct( private readonly ?GlobalContext $gtx = null ) {}
+    public function __construct( private readonly ?GlobalContext $gtx = null ) {
+        if ( $gtx instanceof GlobalContext ) {
+            $this->setDepth( $gtx->getDepth() );
+            $this->setPropertyCount( $gtx->getPropertyCount() );
+        }
+    }
 
 
     public function getGlobalContext() : ?GlobalContext {

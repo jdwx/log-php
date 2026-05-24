@@ -23,6 +23,12 @@ final class AbstractDirectLoggerTest extends TestCase {
         self::assertSame( LogTools::DEFAULT_DEPTH, $logger->getDepth() );
         $logger->setDepth( 123 );
         self::assertSame( 123, $logger->getDepth() );
+
+        $gtx = new GlobalContext();
+        $gtx->setDepth( 234 );
+        $logger = $this->newLogger( $gtx );
+        self::assertSame( 234, $logger->getDepth() );
+
     }
 
 
@@ -53,6 +59,11 @@ final class AbstractDirectLoggerTest extends TestCase {
         self::assertSame( LogTools::DEFAULT_PROPERTY_COUNT, $logger->getPropertyCount() );
         $logger->setPropertyCount( 123 );
         self::assertSame( 123, $logger->getPropertyCount() );
+
+        $gtx = new GlobalContext();
+        $gtx->setPropertyCount( 234 );
+        $logger = $this->newLogger( $gtx );
+        self::assertSame( 234, $logger->getPropertyCount() );
     }
 
 
