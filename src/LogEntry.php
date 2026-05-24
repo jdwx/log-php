@@ -14,6 +14,9 @@ use Stringable;
 readonly class LogEntry implements Stringable, LogEntryInterface, JsonSerializable {
 
 
+    use ReadOnlyValueTrait;
+
+
     public string $level;
 
     public string $message;
@@ -23,7 +26,9 @@ readonly class LogEntry implements Stringable, LogEntryInterface, JsonSerializab
 
 
     /** @param mixed[] $i_rContext */
-    public function __construct( int|string $i_level, string|Stringable $i_stMessage, array $i_rContext ) {
+    public function __construct( int|string     $i_level, string|Stringable $i_stMessage, array $i_rContext,
+                                 ?GlobalContext $gtx = null ) {
+        $this->fromGlobalContext( $gtx );
         $this->level = LogLevels::toString( $i_level ) ?? "INVALID({$i_level})";
         $this->message = strval( $i_stMessage );
         $this->context = $i_rContext;
@@ -51,7 +56,7 @@ readonly class LogEntry implements Stringable, LogEntryInterface, JsonSerializab
         return [
             'level' => $this->level,
             'message' => $this->interpolatedMessage(),
-            'context' => LogTools::value( $this->context ),
+            'context' => $this->value( $this->context ),
         ];
     }
 

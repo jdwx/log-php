@@ -55,7 +55,7 @@ abstract class AbstractBatchLogger extends AbstractDirectLogger {
 
     public function log( $level, string|Stringable $message, array $context = [] ) : void {
         $level = LogLevels::toStringEx( $level );
-        $this->rEntries[] = new LogEntry( $level, LogTools::interpolate( $message, $context ), $context );
+        $this->rEntries[] = new LogEntry( $level, LogTools::interpolate( $message, $context ), $context, $this->getGlobalContext() );
         $this->level = LogLevels::toStringEx( LogLevels::mostSevere( $this->level, $level ) );
     }
 

@@ -37,7 +37,7 @@ class BufferLogger extends AbstractDirectLogger implements Countable {
      */
     public function log( mixed $level, string|Stringable $message, array $context = [] ) : void {
         $context = $this->mergeGlobalContext( $context );
-        $this->rLogs[] = new LogEntry( $level, $message, $context );
+        $this->rLogs[] = new LogEntry( $level, $message, $context, $this->getGlobalContext() );
     }
 
 

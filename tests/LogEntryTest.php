@@ -7,7 +7,9 @@ declare( strict_types = 1 );
 namespace JDWX\Log\Tests;
 
 
+use JDWX\Log\GlobalContext;
 use JDWX\Log\LogEntry;
+use JDWX\Log\LogTools;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
@@ -86,6 +88,17 @@ class LogEntryTest extends TestCase {
     }
 
 
+    public function testDepth() : void {
+        $logEntry = new LogEntry( LOG_INFO, 'test', [] );
+        self::assertSame( LogTools::DEFAULT_DEPTH, $logEntry->getDepth() );
+
+        $gtx = new GlobalContext();
+        $gtx->setDepth( 123 );
+        $logEntry = new LogEntry( LOG_INFO, 'test', [], $gtx );
+        self::assertSame( 123, $logEntry->getDepth() );
+    }
+
+
     public function testInterpolatedMessage() : void {
         $logEntry = new LogEntry( LOG_INFO, 'foo-{bar}-baz', [
             'bar' => 'qux',
@@ -118,9 +131,52 @@ class LogEntryTest extends TestCase {
     }
 
 
+    public function testPropertyCount() : void {
+        $logEntry = new LogEntry( LOG_INFO, 'test', [] );
+        self::assertSame( LogTools::DEFAULT_PROPERTY_COUNT, $logEntry->getPropertyCount() );
+
+        $gtx = new GlobalContext();
+        $gtx->setPropertyCount( 123 );
+        $logEntry = new LogEntry( LOG_INFO, 'test', [], $gtx );
+        self::assertSame( 123, $logEntry->getPropertyCount() );
+    }
+
+
     public function testToString() : void {
         $logEntry = new LogEntry( LOG_INFO, 'test message', [] );
         self::assertSame( '[info] test message', strval( $logEntry ) );
+    }
+
+
+    public function testValueForDepth() : void {
+        $rInput = [
+            'foo' => [
+                'bar' => [
+                    'baz' => [
+                        'qux' => [
+                            'quux' => [
+                                'corge' => 'grault',
+                            ], ], ], ], ], ];
+        $logEntry = new LogEntry( LOG_INFO, 'test', $rInput );
+        self::assertSame( [ 'foo' => [ 'bar' => [ 'baz' => [ '...' ] ] ] ], $logEntry->value( $rInput ) );
+
+        $gtx = new GlobalContext();
+        $gtx->setDepth( 2 );
+
+        $logEntry = new LogEntry( LOG_INFO, 'test', $rInput, $gtx );
+        self::assertSame( [ 'foo' => [ 'bar' => [ '...' ] ] ], $logEntry->value( $rInput ) );
+    }
+
+
+    public function testValueForPropertyCount() : void {
+        $rInput = [ 'foo', 'bar', 'baz', 'qux', 'quux', 'corge', 'grault', 'garply' ];
+        $logEntry = new LogEntry( LOG_INFO, 'test', $rInput );
+        self::assertSame( [ 'foo', 'bar', 'baz', 'qux', 'quux', 'corge', '...' ], $logEntry->value( $rInput ) );
+
+        $gtx = new GlobalContext();
+        $gtx->setPropertyCount( 3 );
+        $logEntry = new LogEntry( LOG_INFO, 'test', $rInput, $gtx );
+        self::assertSame( [ 'foo', 'bar', 'baz', '...' ], $logEntry->value( $rInput ) );
     }
 
 
