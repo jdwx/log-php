@@ -46,7 +46,7 @@ abstract class AbstractFormattedLogger extends AbstractDirectLogger {
         if ( isset( $context[ 'code' ] ) && 0 === $context[ 'code' ] ) {
             unset( $context[ 'code' ] );
         }
-        return LogTools::formatArray( $context );
+        return LogTools::formatArray( $context, $this->getDepth(), $this->getPropertyCount() );
     }
 
 

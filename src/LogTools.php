@@ -7,9 +7,11 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
+use BackedEnum;
 use JsonSerializable;
 use Stringable;
 use Throwable;
+use UnitEnum;
 
 
 class LogTools {
@@ -293,8 +295,8 @@ class LogTools {
             $i_xValue instanceof ContextSerializable => self::valueContext( $i_xValue, $i_uDepth, $i_nuPropertyCount, $i_visited ),
             $i_xValue instanceof JsonSerializable => self::valueJson( $i_xValue, $i_uDepth, $i_nuPropertyCount, $i_visited ),
             $i_xValue instanceof Throwable => self::exceptionToArray( $i_xValue, $i_uDepth, max( 6, $i_nuPropertyCount ) ),
-            $i_xValue instanceof \BackedEnum => $i_xValue::class . '( ' . $i_xValue->name . ': ' . $i_xValue->value . ')',
-            $i_xValue instanceof \UnitEnum => $i_xValue::class . '( ' . $i_xValue->name . ')',
+            $i_xValue instanceof BackedEnum => $i_xValue::class . '( ' . $i_xValue->name . ': ' . $i_xValue->value . ')',
+            $i_xValue instanceof UnitEnum => $i_xValue::class . '( ' . $i_xValue->name . ')',
             $i_xValue instanceof Stringable => $i_xValue::class . '(' . $i_xValue->__toString() . ')',
             default => self::valueObject( $i_xValue, $i_uDepth, $i_nuPropertyCount, $i_visited ),
         };
