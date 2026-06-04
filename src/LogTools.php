@@ -24,7 +24,7 @@ class LogTools {
 
     public static function escape( mixed $i_x ) : mixed {
         return match ( true ) {
-            is_string( $i_x ) => str_replace( [ "\t", "\n", "\r", chr( 0 ) ], [ '\\t', '\\n', '\\r', '\\0' ], $i_x ),
+            is_string( $i_x ) => str_replace( [ "\t", "\r", chr( 0 ) ], [ '\\t', '\\r', '\\0' ], $i_x ),
             is_array( $i_x ) => self::escapeArray( $i_x ),
             default => $i_x,
         };
