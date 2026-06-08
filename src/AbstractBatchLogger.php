@@ -38,14 +38,14 @@ abstract class AbstractBatchLogger extends AbstractDirectLogger {
         $this->rEntries[] = new LogEntry( LogLevel::DEBUG, 'implicit flush by destructor', [
             'class' => static::class,
         ], $this->getGlobalContext() );
-        $this->batch( $this->level, $this->rEntries, $this->rCommonContext );
+        $this->batch( $this->level, $this->rEntries, $this->value( $this->rCommonContext ) );
     }
 
 
     public function flushLog() : void {
         if ( 0 !== count( $this->rEntries ) ) {
             $this->extractCommonContext();
-            $this->batch( $this->level, $this->rEntries, $this->rCommonContext );
+            $this->batch( $this->level, $this->rEntries, $this->value( $this->rCommonContext ) );
             $this->rEntries = [];
         }
         $this->rCommonContext = [];

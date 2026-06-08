@@ -10,6 +10,7 @@ namespace JDWX\Log\Tests;
 use Exception;
 use JDWX\Log\AbstractDirectLogger;
 use JDWX\Log\BufferLogger;
+use JDWX\Log\ContextSerializable;
 use JDWX\Log\GlobalContext;
 use JDWX\Log\LogEntry;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -54,6 +55,41 @@ final class BufferLoggerTest extends TestCase {
         self::assertSame( LogLevel::ALERT, $logEntry->level );
         self::assertSame( 'bar', $logEntry->message );
         self::assertSame( 'foo', $logEntry->context[ 'exception' ][ 'message' ] );
+    }
+
+
+    public function testContextSerializable() : void {
+        $foo = new class implements ContextSerializable {
+
+
+            public int $foo;
+
+            public int $bar;
+
+            public int $baz;
+
+
+            public function contextSerialize() : array {
+                return [
+                    'foo' => $this->foo,
+                    'baz' => $this->baz,
+                ];
+            }
+
+
+        };
+
+        $foo->foo = 1;
+        $foo->bar = 2;
+        $foo->baz = 3;
+        $logger = new BufferLogger();
+        $logger->warning( 'TEST_WARNING', [ 'foo' => $foo ] );
+
+        $logEntry = $logger->shiftLogEx();
+        self::assertSame( LogLevel::WARNING, $logEntry->level );
+        self::assertSame( 'TEST_WARNING', $logEntry->message );
+        self::assertSame( [ 'foo' => [ 'foo' => 1, 'baz' => 3 ] ], $logEntry->context );
+
     }
 
 

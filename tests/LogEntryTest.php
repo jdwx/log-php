@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log\Tests;
 
 
+use JDWX\Log\ContextSerializable;
 use JDWX\Log\GlobalContext;
 use JDWX\Log\LogEntry;
 use JDWX\Log\LogTools;
@@ -145,6 +146,27 @@ class LogEntryTest extends TestCase {
     public function testToString() : void {
         $logEntry = new LogEntry( LOG_INFO, 'test message', [] );
         self::assertSame( '[info] test message', strval( $logEntry ) );
+    }
+
+
+    public function testValueContext() : void {
+        $foo = new class implements ContextSerializable {
+
+
+            public function contextSerialize() : string {
+                return 'foo';
+            }
+
+
+        };
+        $logEntry = new LogEntry( LOG_INFO, 'TEST_MESSAGE', [
+            'foo' => $foo,
+            'bar' => 'baz',
+        ] );
+        self::assertSame( [
+            'foo' => 'foo',
+            'bar' => 'baz',
+        ], $logEntry->valueContext() );
     }
 
 

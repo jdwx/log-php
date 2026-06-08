@@ -7,8 +7,12 @@ declare( strict_types = 1 );
 namespace JDWX\Log;
 
 
-/** @implements \ArrayAccess<int|string, mixed> */
-class GlobalContext implements \ArrayAccess, \JsonSerializable {
+use ArrayAccess;
+use JsonSerializable;
+
+
+/** @implements ArrayAccess<int|string, mixed> */
+class GlobalContext implements ArrayAccess, JsonSerializable {
 
 
     use ValueTrait;
@@ -42,6 +46,13 @@ class GlobalContext implements \ArrayAccess, \JsonSerializable {
 
     public function offsetUnset( mixed $offset ) : void {
         unset( $this->rContext[ $offset ] );
+    }
+
+
+    /** @return array<int|string, mixed> */
+    public function valueContext( int  $i_uDepth = LogTools::DEFAULT_DEPTH,
+                                  ?int $i_nuPropertyCount = LogTools::DEFAULT_PROPERTY_COUNT ) : array {
+        return $this->value( $this->rContext, $i_uDepth, $i_nuPropertyCount );
     }
 
 

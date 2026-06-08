@@ -7,6 +7,7 @@ declare( strict_types = 1 );
 namespace JDWX\Log\Tests;
 
 
+use JDWX\Log\ContextSerializable;
 use JDWX\Log\GlobalContext;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -37,6 +38,25 @@ final class GlobalContextTest extends TestCase {
         $gtx[ 'foo' ] = [ 'bar' => 'baz' ];
         $gtx[ 'qux' ] = 'quux';
         $r = $gtx->jsonSerialize();
+        self::assertCount( 2, $r );
+        self::assertSame( [ 'bar' => 'baz' ], $r[ 'foo' ] );
+        self::assertSame( 'quux', $r[ 'qux' ] );
+    }
+
+
+    public function testValueContext() : void {
+        $gtx = new GlobalContext();
+        $gtx[ 'foo' ] = [ 'bar' => 'baz' ];
+        $gtx[ 'qux' ] = new class implements ContextSerializable {
+
+
+            public function contextSerialize() : string {
+                return 'quux';
+            }
+
+
+        };
+        $r = $gtx->valueContext();
         self::assertCount( 2, $r );
         self::assertSame( [ 'bar' => 'baz' ], $r[ 'foo' ] );
         self::assertSame( 'quux', $r[ 'qux' ] );
