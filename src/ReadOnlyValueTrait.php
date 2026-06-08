@@ -27,7 +27,9 @@ trait ReadOnlyValueTrait {
 
     public function value( mixed          $x, false|int|null $i_nuDepth = false,
                            false|int|null $i_nuPropertyCount = false ) : mixed {
+        /** @phpstan-ignore property.uninitializedReadonly */
         $uDepth = false === $i_nuDepth ? $this->uDepth : ( $i_nuDepth ?? PHP_INT_MAX );
+        /** @phpstan-ignore property.uninitializedReadonly */
         $uPropertyCount = false === $i_nuPropertyCount ? $this->uPropertyCount : $i_nuPropertyCount;
         return LogTools::value( $x, $uDepth, $uPropertyCount );
     }
